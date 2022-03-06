@@ -3,9 +3,26 @@ from app import db
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
+    recipe_item = db.relationship('RecipeItem', backref='item', lazy='dynamic')
 
     def __repr__(self):
         return '<Item {}>'.format(self.name)
+
+class Recipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    recipe_item = db.relationship('RecipeItem', backref='recipe', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Recipe {}>'.format(self.name)
+
+class RecipeItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer(), db.ForeignKey('item.id'))
+    recipe_id = db.Column(db.Integer(), db.ForeignKey('recipe.id'))
+    quantity = db.Column(db.Integer, default=1)
+
+
 
 '''
 
@@ -18,15 +35,7 @@ class Item_Category(db.Model):
     def __repr__(self):
         return '<Category {}>'.format(self.name)
 
-class Recipe(db.Model):
-    __tablename__ = 'recipe'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
-    items = db.relationship('Item', backref='recipe', lazy='dynamic')
-    weekday_id = db.Column(db.Integer, db.ForeignKey('weekday.id'), nullable=True)
 
-    def __repr__(self):
-        return '<Recipe {}>'.format(self.name)
 
 class Weekday(db.Model):
     id = db.Column(db.Integer, primary_key=True)

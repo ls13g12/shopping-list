@@ -2,6 +2,35 @@
 
 {% block content %}
 
-<script type="text/javascript" src="{{ url_for('static', filename = 'recipes.js') }}"></script>
+<!-- List group -->
+<div class="list-group" >
+    {% for id in recipe_items.keys() %}
+        <a class="list-group-item list-group-item-action" id={{'recipe-' ~ id}}>{{recipe_items[id]['name']}}</a>
+        <div id={{'recipe-' ~ id ~ '-items'}} class="list-group" style="display:none">
+                {% for item in recipe_items[id]['items'] %}
+                <li class="list-group-item list-group-item-light">
+                    {{item}}
+                </li>
+                {% endfor %}
+                <li class="list-group-item list-group-item-light">
+                    <input style="width: 80px;">
+                </li>
+        </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Tab panes -->
 
+
+<script type="text/javascript" src="{{ url_for('static', filename = 'recipes.js') }}"></script>
+<style>
+.list-group-item-action{
+    font-size: 18px
+}
+
+.list-group-item-light{
+    text-indent:20px;
+    font-size: 16px
+}
+</style>
 {% endblock %}
