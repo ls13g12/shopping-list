@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+        <ul>
+        {% for item in items %}
+        <li>{{item.name}}</li>
+        {% endfor %}
+        </ul>
+        <script type="text/javascript" src="{{ url_for('static', filename = 'list.js') }}"></script>
+
+{% endblock %}
