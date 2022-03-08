@@ -24,10 +24,12 @@ function initialise_enter_keydown(recipe_element_id, add_item_to_recipe_input_id
     var input_element = document.getElementById(add_item_to_recipe_input_id)
     input_element.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
-          //input_element.
+          let new_item = input_element.value
+          add_item_to_recipe(new_item, recipe_element_id)
         }
     });
 }
+
 
 async function update_recipe_items(recipe_element_id){
     const items = await get_items(recipe_element_id)
@@ -80,6 +82,30 @@ async function get_items(recipe_element_id=null){
         .then(res => res.json())
         .then(data => {
             return data.data
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        })
+    return res
+}
+
+
+async function add_item_to_recipe(new_item, recipe_element_id){
+    let arr = recipe_element_id.split("-")
+    var recipe_id = arr.pop()
+
+    var data = {recipe_id: recipe_id, item: new_item}
+    const res = await fetch('/add_item_to_recipe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log(res.success)
+            update_recipe_items(recipe_element_id)
         })
         .catch((error) => {
             console.error('Error:', error);

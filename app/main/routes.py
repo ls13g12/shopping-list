@@ -42,6 +42,32 @@ def get_items():
     
     return jsonify({'data': item_names})
 
+@bp.route('/add_item_to_recipe', methods=['POST'])
+def add_item_to_recipe():
+    req = request.get_json()
+    recipe_id = req['recipe_id']
+    item_name = req['item']
+
+    item = Item.query.filter_by(name=item_name).first()
+    if not item:
+        item = Item(name=item_name)
+        db.session.add(item)
+        db.session.commit()
+    item = Item.query.filter_by(name=item_name).first()
+
+    recipe_item = RecipeItem.query.filter_by(item_id=item.id, recipe_id=recipe_id).first()
+    if recipe_item:
+        recipe_item.quantity += 1
+
+    if not recipe_item:
+        recipe_item = RecipeItem(item_id=item.id, recipe_id=recipe_id)
+        db.session.add(recipe_item)
+        db.session.commit()
+
+    return jsonify(success=True), 200
+
+
+
 '''
     #create dict with recipe name as key for all item names in that recipe
     for recipe_item_query in recipe_items_query:
