@@ -29,18 +29,18 @@ def get_items():
     if recipe_id:
         recipe = Recipe.query.filter_by(id=recipe_id).first()
         recipe_items = RecipeItem.query.filter_by(recipe_id=recipe.id).join(Item).all()
-        item_names = []
+        items = []
         for recipe_item in recipe_items:
-            item_names.append(recipe_item.item.name)
+            items.append({'id': recipe_item.id, 'name': recipe_item.item.name})
     
     else:
         items = Item.query.all()
     
-        item_names = []
+        items = []
         for item in items:
-            item_names.append(item.name)
+            items.append({'id': item.id, 'name': item.name})
     
-    return jsonify({'data': item_names})
+    return jsonify({'data': items})
 
 @bp.route('/add_item_to_recipe', methods=['POST'])
 def add_item_to_recipe():
@@ -66,17 +66,19 @@ def add_item_to_recipe():
 
     return jsonify(success=True), 200
 
+@bp.route('/remove_item_from_recipe', methods=['POST'])
+def remove_item_from_recipe():
+    req = request.get_json()
+    recipe_item_id = req['recipe_item_id']
 
 
-'''
-    #create dict with recipe name as key for all item names in that recipe
-    for recipe_item_query in recipe_items_query:
-        if recipe_item_query.recipe.id in recipe_items:
-            recipe_items[recipe_item_query.recipe.id['items']].append(recipe_item_query.item.name)
-        else:
-            recipe_items.update({recipe_item_query.recipe.id :
-                                    {'name': recipe_item_query.recipe.name,
-                                    'items': [recipe_item_query.item.name]}})
-'''
+    recipe_item = RecipeItem.query.filter_by(id=recipe_item_id).first()
+    if recipe_item:
+        db.session.delete(recipe_item)
+        db.session.commit()
+
+    return jsonify(success=True), 200
+
+
 
 
