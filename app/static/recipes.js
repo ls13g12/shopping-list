@@ -12,8 +12,16 @@ function initialise_toggle_items(){
         recipe_list_elements[i].addEventListener('click', function(event) {
             event.preventDefault();
             if(recipe_items_div.style.display == 'none'){
-                recipe_items_div.style.display = 'block'
+                //close all other item lists
+                let all_divs = document.getElementsByClassName('list-group')
+                console.log(all_divs)
+                //skip main list, start for index 1
+                for(let j=1; j < all_divs.length; j++){
+                    all_divs[j].style.display = 'none'
+                }
+                //set clicked div to display
                 update_recipe_items(this.id)
+                recipe_items_div.style.display = 'block'
             }
             else{
                 recipe_items_div.style.display = 'none'
@@ -67,11 +75,11 @@ async function update_recipe_list(){
         recipe_list_div.appendChild(a)
         
         let div = document.createElement('div')
-        div.classList.add('list-group')
+        recipe_list_div.appendChild(div)
+        div.classList.add('list-group', 'recipe-item-list-div')
         let div_id = 'recipe-' + recipes[i]['id'] + '-items'
         div.setAttribute('id', div_id)
         div.setAttribute('style', 'display:none')
-        recipe_list_div.appendChild(div)
     }
     //add input box for new items under item list
     let li = document.createElement('li')

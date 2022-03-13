@@ -39,7 +39,7 @@ def get_recipes():
 @bp.route('/add_recipe', methods=['POST'])
 def add_recipe():
     req = request.get_json()
-    recipe_name = req['recipe']
+    recipe_name = req['recipe'].lower()
 
     recipe = Recipe.query.filter_by(name=recipe_name).first()
     if not recipe:
@@ -51,10 +51,6 @@ def add_recipe():
     
     if recipe:
         return jsonify(success=False, error="recipe already exists"), 204
-
-
-
-
 
 
 @bp.route('/get_items', methods=['POST'])
@@ -82,7 +78,7 @@ def get_items():
 def add_item_to_recipe():
     req = request.get_json()
     recipe_id = req['recipe_id']
-    item_name = req['item']
+    item_name = req['item'].lower()
 
     item = Item.query.filter_by(name=item_name).first()
     if not item:
