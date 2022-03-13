@@ -21,6 +21,42 @@ def recipes():
 
     return render_template('recipes.html', recipes=recipes_array)
 
+
+@bp.route('/get_recipes', methods=['POST'])
+def get_recipes():
+
+    recipes = Recipe.query.all()
+    
+    recipes_data = []
+    if recipes:
+        for recipe in recipes:
+            recipes_data.append({'id': recipe.id, 'name': recipe.name})
+    else:
+        recipes_data = None
+
+    return jsonify({'data': recipes_data})
+
+@bp.route('/add_recipe', methods=['POST'])
+def add_recipe():
+    req = request.get_json()
+    recipe_name = req['recipe']
+
+    recipe = Recipe.query.filter_by(name=recipe_name).first()
+    if not recipe:
+        recipe = Recipe(name=recipe_name)
+        db.session.add(recipe)
+        db.session.commit()
+        
+        return jsonify(success=True)
+    
+    if recipe:
+        return jsonify(success=False, error="recipe already exists"), 204
+
+
+
+
+
+
 @bp.route('/get_items', methods=['POST'])
 def get_items():
     req = request.get_json()
