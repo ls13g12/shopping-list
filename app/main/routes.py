@@ -53,6 +53,23 @@ def add_recipe():
         return jsonify(success=False, error="recipe already exists"), 204
 
 
+@bp.route('/remove_recipe', methods=['POST'])
+def remove_recipe():
+    req = request.get_json()
+    recipe_id = req['recipe_id']
+
+    #delete all items linked to recipe in RecipeItem table
+    recipe = Recipe.query.filter_by(id=recipe_id).first()
+    if recipe:
+        recipe_items = RecipeItem.query.filter_by(recipe_id=recipe.id).all()
+        for recipe_item in recipe_items:
+            db.session.delete(recipe_item)
+        db.session.delete(recipe)
+        db.session.commit()
+
+    return jsonify(success=True), 200
+
+
 @bp.route('/get_items', methods=['POST'])
 def get_items():
     req = request.get_json()

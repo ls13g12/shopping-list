@@ -1,6 +1,5 @@
 $(document).ready(function(){
-    initialise_toggle_items()
-    initialise_enter_keydown_recipe()
+    update_recipe_list()
 })
 
 function initialise_toggle_items(){
@@ -14,7 +13,6 @@ function initialise_toggle_items(){
             if(recipe_items_div.style.display == 'none'){
                 //close all other item lists
                 let all_divs = document.getElementsByClassName('list-group')
-                console.log(all_divs)
                 //skip main list, start for index 1
                 for(let j=1; j < all_divs.length; j++){
                     all_divs[j].style.display = 'none'
@@ -50,17 +48,24 @@ function initialise_enter_keydown_recipe(){
     });
 }
 
+function initialise_remove_recipe_button(remove_recipe_button_id, recipe_id){
+    let remove_recipe_button = document.getElementById(remove_recipe_button_id)
+    remove_recipe_button.addEventListener('click', function(){
+        if (confirm("Are you sure?")) remove_recipe(recipe_id)
+    })
+}
+
 function initialise_remove_item_button(remove_item_button_id, recipe_item_id, recipe_element_id){
     let remove_item_button = document.getElementById(remove_item_button_id)
     remove_item_button.addEventListener('click', function(){
-        remove_item_from_recipe(recipe_item_id, recipe_element_id)
+        if (confirm("Are you sure?")) remove_item_from_recipe(recipe_item_id, recipe_element_id)
     })
 }
 
 async function update_recipe_list(){
     const recipes = await get_recipes()
-    console.log(recipes)
-    //empty recipe list
+
+    //empty the recipe list
     let recipe_list_div = document.getElementById("recipe-list")
     recipe_list_div.innerHTML = ""
     
@@ -73,6 +78,18 @@ async function update_recipe_list(){
         a.setAttribute('id', recipe_id)
         a.appendChild(document.createTextNode(recipes[i]['name']))
         recipe_list_div.appendChild(a)
+
+        //delete button on right of list element
+        let button_div = document.createElement('div')
+        button_div.style.cssFloat = 'right'
+        a.appendChild(button_div)
+        let button = document.createElement('button')
+        button_div.appendChild(button)
+        button.appendChild(document.createTextNode('X'))
+        let remove_recipe_button_id = 'remove-recipe-' + recipe_id
+        button.setAttribute('id', remove_recipe_button_id)
+
+        initialise_remove_recipe_button(remove_recipe_button_id, recipe_id)
         
         let div = document.createElement('div')
         recipe_list_div.appendChild(div)
@@ -84,8 +101,6 @@ async function update_recipe_list(){
     //add input box for new items under item list
     let li = document.createElement('li')
     li.classList.add('list-group-item')
-    li.classList.add('list-group-item-action')
-
     
     let input = document.createElement('input')
     let add_recipe_input_id = "add-recipe-input"
@@ -138,8 +153,27 @@ async function add_recipe(new_recipe){
     return res
 }
 
+async function remove_recipe(recipe_id){
+    let arr = recipe_id.split("-")
+    var recipe_id = arr.pop()
 
-
+    var data = {recipe_id: recipe_id}
+    const res = await fetch('/remove_recipe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        })
+        .then(res => res.json())
+        .then(res => {
+            update_recipe_list()
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        })
+    return res
+}
 
 async function update_recipe_items(recipe_element_id){
     const items = await get_items(recipe_element_id)
