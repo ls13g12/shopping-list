@@ -1,4 +1,5 @@
-from flask import render_template, redirect, url_for, jsonify, request
+from flask import render_template, make_response, jsonify, request
+from sqlalchemy.exc import SQLAlchemyError
 from app import db
 from app.models import Item, Recipe, RecipeItem
 from app.main import bp
@@ -41,16 +42,24 @@ def add_recipe():
     req = request.get_json()
     recipe_name = req['recipe'].lower()
 
-    recipe = Recipe.query.filter_by(name=recipe_name).first()
-    if not recipe:
-        recipe = Recipe(name=recipe_name)
-        db.session.add(recipe)
-        db.session.commit()
+    try:
+        recipe = Recipe.query.filter_by(name=recipe_name).first()
+        if not recipe:
+            recipe = Recipe(name=recipe_name)
+            db.session.add(recipe)
+            db.session.commit()
+            
+            res = make_response(jsonify({}), 204)
+            return res
         
-        return jsonify(success=True)
+        if recipe:
+            res = make_response(jsonify({"error": "Recipe already exists"}), 409)
+            return res
     
-    if recipe:
-        return jsonify(success=False, error="recipe already exists"), 204
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
 
 
 @bp.route('/remove_recipe', methods=['POST'])

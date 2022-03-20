@@ -116,6 +116,7 @@ async function update_recipe_list(){
     initialise_toggle_items()
 }
 
+//returns an array of dicts with keys of recipe id and recipe name
 async function get_recipes(){
 
     const res = await fetch('/get_recipes', {
@@ -134,6 +135,8 @@ async function get_recipes(){
     return res
 }
 
+//add recipes to database and calls the update recipe lists function
+//returns an error if recipe already exists in db
 async function add_recipe(new_recipe){
     var data = {recipe: new_recipe}
     const res = await fetch('/add_recipe', {
@@ -143,14 +146,16 @@ async function add_recipe(new_recipe){
         },
         body: JSON.stringify(data),
         })
-        .then(res => res.json())
-        .then(res => {
-            update_recipe_list()
+        .then(async res => {
+            if (!res.ok){
+                const data = await res.json()
+                console.log(data.error)
+            }
+            else update_recipe_list()
         })
         .catch((error) => {
             console.error('Error:', error);
-        })
-    return res
+    })
 }
 
 async function remove_recipe(recipe_id){
