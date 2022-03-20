@@ -70,33 +70,35 @@ async function update_recipe_list(){
     recipe_list_div.innerHTML = ""
     
     //create and append list element for each item in recipe
-    for(let i=0; i < recipes.length; i++){
-        let a = document.createElement('a')
-        a.classList.add('list-group-item')
-        a.classList.add('list-group-item-action')
-        let recipe_id = 'recipe-' + recipes[i]['id']
-        a.setAttribute('id', recipe_id)
-        a.appendChild(document.createTextNode(recipes[i]['name']))
-        recipe_list_div.appendChild(a)
+    if (recipes){
+        for(let i=0; i < recipes.length; i++){
+            let a = document.createElement('a')
+            a.classList.add('list-group-item')
+            a.classList.add('list-group-item-action')
+            let recipe_id = 'recipe-' + recipes[i]['id']
+            a.setAttribute('id', recipe_id)
+            a.appendChild(document.createTextNode(recipes[i]['name']))
+            recipe_list_div.appendChild(a)
 
-        //delete button on right of list element
-        let button_div = document.createElement('div')
-        button_div.style.cssFloat = 'right'
-        a.appendChild(button_div)
-        let button = document.createElement('button')
-        button_div.appendChild(button)
-        button.appendChild(document.createTextNode('X'))
-        let remove_recipe_button_id = 'remove-recipe-' + recipe_id
-        button.setAttribute('id', remove_recipe_button_id)
+            //delete button on right of list element
+            let button_div = document.createElement('div')
+            button_div.style.cssFloat = 'right'
+            a.appendChild(button_div)
+            let button = document.createElement('button')
+            button_div.appendChild(button)
+            button.appendChild(document.createTextNode('X'))
+            let remove_recipe_button_id = 'remove-recipe-' + recipe_id
+            button.setAttribute('id', remove_recipe_button_id)
 
-        initialise_remove_recipe_button(remove_recipe_button_id, recipe_id)
-        
-        let div = document.createElement('div')
-        recipe_list_div.appendChild(div)
-        div.classList.add('list-group', 'recipe-item-list-div')
-        let div_id = 'recipe-' + recipes[i]['id'] + '-items'
-        div.setAttribute('id', div_id)
-        div.setAttribute('style', 'display:none')
+            initialise_remove_recipe_button(remove_recipe_button_id, recipe_id)
+            
+            let div = document.createElement('div')
+            recipe_list_div.appendChild(div)
+            div.classList.add('list-group', 'recipe-item-list-div')
+            let div_id = 'recipe-' + recipes[i]['id'] + '-items'
+            div.setAttribute('id', div_id)
+            div.setAttribute('style', 'display:none')
+        }
     }
     //add input box for new items under item list
     let li = document.createElement('li')
