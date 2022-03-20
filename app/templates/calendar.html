@@ -2,6 +2,25 @@
 
 {% block content %}
 
-        <script type="text/javascript" src="{{ url_for('static', filename = 'calendar.js') }}"></script>
+<form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+                {{ form.start_date.label }}<br>
+                {{ form.start_date(size=32) }}
+        </p>
+        <p>
+                {{ form.end_date.label }}<br>
+                {{ form.end_date(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+</form>
+
+<div >
+        {% for date in dates %}
+        <p>{{date}}</p>
+        {% endfor %}
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename = 'calendar.js') }}"></script>
 
 {% endblock %}

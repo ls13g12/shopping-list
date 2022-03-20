@@ -1,15 +1,30 @@
-from app import create_app
+import os
+os.environ['DATABASE_URL'] = 'sqlite://'  # use an in-memory database for tests
+
+import unittest
+from flask import current_app
+from app import create_app, db
 
 
-def test_home_page():
-    """
-    GIVEN a Flask application configured for testing
-    WHEN the '/' page is requested (GET)
-    THEN check that the response is valid
-    """
-    flask_app = create_app()
+class TestWebApp(unittest.TestCase):
+    def setUp(self):
+        self.app = create_app()
+        self.appctx = self.app.app_context()
+        self.appctx.push()
+        db.create_all()
+        self.client = self.app.test_client()
 
-    # Create a test client using the Flask application configured for testing
-    with flask_app.test_client() as test_client:
-        response = test_client.get('/')
+    def tearDown(self):
+        db.drop_all()
+        self.appctx.pop()
+        self.app = None
+        self.appctx = None
+        self.client = None
+
+    def test_app(self):
+        assert self.app is not None
+        assert current_app == self.app
+
+    def test_home_page_redirect(self):
+        response = self.client.get('/', follow_redirects=True)
         assert response.status_code == 200

@@ -3,6 +3,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from app import db
 from app.models import Item, Recipe, RecipeItem
 from app.main import bp
+from app.main.forms import SelectDatesForm
+from datetime import date, timedelta
 
 
 @bp.route('/')
@@ -33,6 +35,27 @@ def recipes():
         recipes_array.append({'id': recipe.id, 'name': recipe.name})
 
     return render_template('recipes.html', recipes=recipes_array)
+
+
+@bp.route('/calendar', methods=['GET', 'POST'])
+def calendar():
+    form = SelectDatesForm()
+    dates = []
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+
+        try:
+            if form.validate_dates(start_date, end_date):
+                date = start_date
+
+                while date <= end_date:
+                    dates.append(date.strftime("%A %d/%m/%y "))
+                    date += timedelta(days=1)
+        except:
+            print("end date must be after start")
+    
+    return render_template('calendar.html', form=form, dates=dates)
 
 
 @bp.route('/get_recipes', methods=['POST'])
