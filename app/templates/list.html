@@ -3,9 +3,9 @@
 {% block content %}
 
         <ul class="list-group">
-        {% for recipe_item in recipe_items %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">{{recipe_item.item.name}}
-                <span class="badge badge-primary badge-pill">{{recipe_item.quantity}}</span>
+        {% for item in items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">{{item['name']}}
+                <span class="badge badge-primary badge-pill">{{item.quantity}}</span>
         </li>
         {% endfor %}
         </ul>

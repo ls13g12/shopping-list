@@ -254,26 +254,31 @@ async function get_items(recipe_element_id=null){
     return res
 }
 
+
+//add item to recipe
+//calls update items to recipe function on success 2xx 
 async function add_item_to_recipe(new_item, recipe_element_id){
     let arr = recipe_element_id.split("-")
     var recipe_id = arr.pop()
 
     var data = {recipe_id: recipe_id, item: new_item}
-    const res = await fetch('/add_item_to_recipe', {
+    fetch('/add_item_to_recipe', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
         })
-        .then(res => res.json())
-        .then(res => {
-            update_recipe_items(recipe_element_id)
+        .then(async res => {
+            if(!res.ok){
+                const data = await res.json()
+                console.log(data.error)
+            }
+            if(res.ok) update_recipe_items(recipe_element_id)
         })
         .catch((error) => {
             console.error('Error:', error);
         })
-    return res
 }
 
 async function remove_item_from_recipe(recipe_item_id, recipe_element_id){

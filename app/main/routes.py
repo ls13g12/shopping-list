@@ -9,7 +9,19 @@ from app.main import bp
 @bp.route('/list')
 def list():
     recipe_items = RecipeItem.query.join(Item).all()
-    return render_template('list.html', recipe_items=recipe_items)
+    items = []
+
+    for recipe_item in recipe_items:
+        item_data = {'name': recipe_item.item.name, 'quantity': recipe_item.quantity}
+
+        if item_data in items:
+            index = items.index(item_data)
+            items[index]['quantity'] += recipe_item.quantity
+        
+        else:
+            items.append(item_data)
+            
+    return render_template('list.html', items=items)
 
 @bp.route('/recipes')
 def recipes():
@@ -43,7 +55,6 @@ def add_recipe():
     req = request.get_json()
     recipe_name = req['recipe'].lower()
 
-    
     try:
         recipe = Recipe.query.filter_by(name=recipe_name).first()
 
@@ -111,23 +122,31 @@ def add_item_to_recipe():
     recipe_id = req['recipe_id']
     item_name = req['item'].lower()
 
-    item = Item.query.filter_by(name=item_name).first()
-    if not item:
-        item = Item(name=item_name)
-        db.session.add(item)
-        db.session.commit()
-    item = Item.query.filter_by(name=item_name).first()
+    #try query database
+    try:
+        item = Item.query.filter_by(name=item_name).first()
+        if not item:
+            item = Item(name=item_name)
+            db.session.add(item)
+            db.session.commit()
 
-    recipe_item = RecipeItem.query.filter_by(item_id=item.id, recipe_id=recipe_id).first()
-    if recipe_item:
-        recipe_item.quantity += 1
+        recipe_item = RecipeItem.query.filter_by(item_id=item.id, recipe_id=recipe_id).first()
+        if recipe_item:
+            res = make_response(jsonify({"error": "Item already exists in recipe"}), 409)
+            return res
 
-    if not recipe_item:
-        recipe_item = RecipeItem(item_id=item.id, recipe_id=recipe_id)
-        db.session.add(recipe_item)
-        db.session.commit()
+        if not recipe_item:
+            recipe_item = RecipeItem(item_id=item.id, recipe_id=recipe_id)
+            db.session.add(recipe_item)
+            db.session.commit()
+            res = make_response(jsonify({}), 204)
+            return res
 
-    return jsonify(success=True), 200
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
+
 
 @bp.route('/remove_item_from_recipe', methods=['POST'])
 def remove_item_from_recipe():
