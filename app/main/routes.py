@@ -39,11 +39,15 @@ def get_recipes():
 
 @bp.route('/add_recipe', methods=['POST'])
 def add_recipe():
+    #lower case recipe name from fetch request body
     req = request.get_json()
     recipe_name = req['recipe'].lower()
 
+    
     try:
         recipe = Recipe.query.filter_by(name=recipe_name).first()
+
+        #add recipe to db
         if not recipe:
             recipe = Recipe(name=recipe_name)
             db.session.add(recipe)
@@ -52,6 +56,7 @@ def add_recipe():
             res = make_response(jsonify({}), 204)
             return res
         
+        #return 409 conflict if recipe already exists
         if recipe:
             res = make_response(jsonify({"error": "Recipe already exists"}), 409)
             return res
