@@ -8,7 +8,6 @@ def app():
     app = create_app()
     return app
 
-
 @pytest.fixture(scope='module')
 def new_item():
     item = Item(name='item_name')
