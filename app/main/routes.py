@@ -39,23 +39,7 @@ def recipes():
 
 @bp.route('/calendar', methods=['GET', 'POST'])
 def calendar():
-    form = SelectDatesForm()
-    dates = []
-    if form.validate_on_submit():
-        start_date = form.start_date.data
-        end_date = form.end_date.data
-
-        try:
-            if form.validate_dates(start_date, end_date):
-                date = start_date
-
-                while date <= end_date:
-                    dates.append(date.strftime("%A %d/%m/%y "))
-                    date += timedelta(days=1)
-        except:
-            print("end date must be after start")
-    
-    return render_template('calendar.html', form=form, dates=dates)
+    return render_template('calendar.html')
 
 
 @bp.route('/get_recipes', methods=['POST'])

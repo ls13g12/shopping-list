@@ -2,25 +2,27 @@
 
 {% block content %}
 
-<form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-                {{ form.start_date.label }}<br>
-                {{ form.start_date(size=32) }}
-        </p>
-        <p>
-                {{ form.end_date.label }}<br>
-                {{ form.end_date(size=32) }}
-        </p>
-        <p>{{ form.submit() }}</p>
-</form>
+<div>
+        <div>
+                <label for="start-date">Start Date:</label>
+                <input id="start-date" type="date">
+                <label for="end-date">End Date:</label>
+                <input id="end-date" type="date">
+        </div>
+        <button id="submit-dates-button">Submit</button>
 
-<div >
-        {% for date in dates %}
-        <p>{{date}}</p>
-        {% endfor %}
+
+        <div id="calendar-view-div">
+
+        </div>
 </div>
 
 <script type="text/javascript" src="{{ url_for('static', filename = 'calendar.js') }}"></script>
+<style>
+.dave-div{
+        height: 50px;
+        border-color: black;
+}
+</style>
 
 {% endblock %}
