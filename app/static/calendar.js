@@ -42,26 +42,46 @@ function submitDates(){
 }
 
 function loadCalendarView(startDate, endDate){
-    //div for all div
-    let div = document.getElementById('calendar-view-div')
-    div.innerHTML = ""
-
     let date = startDate
+    clearDateTable()
+    //createDateTable();
     while(date <= endDate){
-        addDateDiv(date)
+        addDateRow(date)
         date.setDate(date.getDate() + 1)
     }
 }
 
-function addDateDiv(date){
-    //div for all calendar entries
-    let div = document.getElementById('calendar-view-div')
-
-    let dateDiv = document.createElement('div')
-    dateDiv.classList.add('date-div')
-    dateDiv.appendChild(document.createTextNode(date.toDateString()))
-
-    div.appendChild(dateDiv)
+function clearDateTable(){
+    let tableBody = document.getElementById('calendar-table-body')
+    tableBody.innerHTML = ""
 }
 
+function addDateRow(date){
+    let tableBody = document.getElementById('calendar-table-body')
 
+    let tr = document.createElement('tr')
+    console.log(date.toLocaleDateString())
+
+    let th = document.createElement('th')
+    th.setAttribute('scope', 'row')
+    th.classList.add('w-25', 'text-center')
+    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"})))
+    th.appendChild(document.createElement('br'))
+    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))
+    
+    let td = document.createElement('td')
+    
+    let select = document.createElement('select')
+    select.classList.add("custom-select")
+    let option = document.createElement('option')
+    option.value = 'recipe-1'
+    option.appendChild(document.createTextNode('recipe_name'))
+    select.appendChild(option)
+
+
+    td.appendChild(select)
+
+    tr.appendChild(th)
+    tr.appendChild(td)
+    tableBody.appendChild(tr)
+}
