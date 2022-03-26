@@ -60,7 +60,8 @@ function addDateRow(date){
     let tableBody = document.getElementById('calendar-table-body')
 
     let tr = document.createElement('tr')
-    console.log(date.toLocaleDateString())
+    let date_string = date.toLocaleDateString()
+    tr.setAttribute('id', date_string)
 
     let th = document.createElement('th')
     th.setAttribute('scope', 'row')
@@ -70,18 +71,39 @@ function addDateRow(date){
     th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))
     
     let td = document.createElement('td')
-    
-    let select = document.createElement('select')
-    select.classList.add("custom-select")
-    let option = document.createElement('option')
-    option.value = 'recipe-1'
-    option.appendChild(document.createTextNode('recipe_name'))
-    select.appendChild(option)
-
-
-    td.appendChild(select)
-
     tr.appendChild(th)
     tr.appendChild(td)
     tableBody.appendChild(tr)
+  
+    addRecipeDropdownBox(td, date_string)
+}
+
+async function addRecipeDropdownBox(td, date_string){
+    let select = document.createElement('select')
+    select.classList.add("custom-select")
+    const res = await fetch('/get_recipes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        })
+        .then(res => res.json())
+        .then(data => {
+            let recipes = data.data
+            for(let i=0; i < recipes.length; i++){
+                let option = createRecipeOption(recipes[i])
+                select.appendChild(option)
+            }
+            td.appendChild(select)
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+    })
+}
+
+function createRecipeOption(recipe){
+    let option = document.createElement('option')
+    option.value = recipe.id
+    option.appendChild(document.createTextNode(recipe.name))
+    return option
 }
