@@ -65,12 +65,14 @@ function addDateRow(date){
 
     let th = document.createElement('th')
     th.setAttribute('scope', 'row')
-    th.classList.add('w-25', 'text-center')
+    th.classList.add('w-20', 'text-center')
+    th.setAttribute('scope', 'row')
     th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"})))
     th.appendChild(document.createElement('br'))
     th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))
     
     let td = document.createElement('td')
+    td.classList.add('w-40')
     tr.appendChild(th)
     tr.appendChild(td)
     tableBody.appendChild(tr)
@@ -78,9 +80,29 @@ function addDateRow(date){
     addRecipeDropdownBox(td, date_string)
 }
 
+//create recipe dropbox box for user to select all recipes
 async function addRecipeDropdownBox(td, date_string){
+    let div = document.createElement('div')
+    div.classList.add('input-group')
     let select = document.createElement('select')
     select.classList.add("custom-select")
+    select.setAttribute('style', 'width:60%')
+    select.id = "select-recipe-" + date_string
+    div.appendChild(select)
+
+    let button_div = document.createElement('div')
+    button_div.classList.add('input-group-append')
+    let button = document.createElement('button')
+    button.classList.add('btn', 'btn-outline-secondary')
+    button.type = "button"
+    button.innerHTML = "Add"
+
+    initialiseAddRecipeButton(button, select, date_string)
+    
+    button_div.appendChild(button)
+    div.appendChild(button_div)
+
+
     const res = await fetch('/get_recipes', {
         method: 'POST',
         headers: {
@@ -94,7 +116,7 @@ async function addRecipeDropdownBox(td, date_string){
                 let option = createRecipeOption(recipes[i])
                 select.appendChild(option)
             }
-            td.appendChild(select)
+            td.appendChild(div)
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -106,4 +128,39 @@ function createRecipeOption(recipe){
     option.value = recipe.id
     option.appendChild(document.createTextNode(recipe.name))
     return option
+}
+
+function initialiseAddRecipeButton(button, select, date_string){
+    button.addEventListener('click', function(event){
+        event.stopPropagation()
+        event.preventDefault()
+
+        recipe_id = select.value
+        
+        updateRecipe(recipe_id, date_string)
+    })
+}
+
+async function updateRecipe(recipe_id, date_string){
+    var recipe_data = {
+        recipe_id: recipe_id,
+        date_string: date_string
+    }
+    const res = await fetch('/add_recipe_date', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipe_data)
+        })
+        .then(async res => {
+            if(!res.ok){
+                const data = await res.json()
+                console.log(data.error)
+            }
+            if(res.ok) console.log('success')
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+    })
 }

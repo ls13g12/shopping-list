@@ -1,10 +1,10 @@
 from flask import render_template, make_response, jsonify, request
+from pendulum import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
-from app.models import Item, Recipe, RecipeItem
+from app.models import Item, Recipe, RecipeDateLog, RecipeItem
 from app.main import bp
-from app.main.forms import SelectDatesForm
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
 
 @bp.route('/')
@@ -123,6 +123,7 @@ def get_items():
     
     return jsonify({'data': items})
 
+
 @bp.route('/add_item_to_recipe', methods=['POST'])
 def add_item_to_recipe():
     req = request.get_json()
@@ -169,5 +170,43 @@ def remove_item_from_recipe():
     return jsonify(success=True), 200
 
 
+@bp.route('/add_recipe_date', methods=['POST'])
+def add_recipe_date():
+    #lower case recipe name from fetch request body
+    req = request.get_json()
+    recipe_id = req['recipe_id']
+    date_string = req['date_string']
+
+    date = datetime.strptime(date_string, "%d/%m/%Y")
+    tomorrow_date = date + timedelta(days=1)
+
+
+    try:
+        recipe = Recipe.query.filter_by(id=recipe_id).first()
+        recipe_dates = RecipeDateLog.query.filter(RecipeDateLog.date >= date, RecipeDateLog.date < tomorrow_date).all()
+
+        if recipe_dates:   
+            for recipe_date in recipe_dates:
+                if recipe.id == recipe_date.recipe.id:
+                    res = make_response(jsonify({"error": "Recipe already added"}), 409)
+                    return res
+                else:
+                    db.session.delete(recipe_date)
+                    db.session.commit()
+
+        #add recipe_date to db
+        recipe_date = RecipeDateLog(recipe_id=recipe.id, date = date)
+        db.session.add(recipe_date)
+        db.session.commit()
+        
+        res = make_response(jsonify({}), 204)
+        return res
+
+
+  
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
 
 

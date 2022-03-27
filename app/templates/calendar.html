@@ -14,6 +14,11 @@
 
         <div id="calendar-view-div">
                 <table class="table table-bordered ">
+                        <thead>
+                                <th scope="col" class="w-20 text-center"></th>
+                                <th scope="col" class="w-40">Recipe</th>
+                                <th scope="col" class="w-40">Extra Items</th>
+                        </thead>
                         <tbody id="calendar-table-body">
                                 <tr>
                                         <th></th>
@@ -27,10 +32,15 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename = 'calendar.js') }}"></script>
 <style>
-.dave-div{
-        height: 50px;
-        border-color: black;
+.btn{
+        font-size: 0.8em;
 }
+table .w-20 { 
+        width:20%; 
+}
+table .w-40 { 
+        width:40%; 
+        }
 </style>
 
 {% endblock %}
