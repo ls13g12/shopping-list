@@ -56,6 +56,7 @@ def get_recipes():
 
     return jsonify({'data': recipes_data})
 
+
 @bp.route('/add_recipe', methods=['POST'])
 def add_recipe():
     #lower case recipe name from fetch request body
@@ -168,6 +169,30 @@ def remove_item_from_recipe():
         db.session.commit()
 
     return jsonify(success=True), 200
+
+
+@bp.route('/get_recipes_for_date', methods=['POST'])
+def get_recipes_for_date():
+    req = request.get_json()
+    date_string = req['date_string']
+    date = datetime.strptime(date_string, "%d/%m/%Y")
+    tomorrow_date = date + timedelta(days=1)
+
+    try:
+        recipe_dates = RecipeDateLog.query.filter(RecipeDateLog.date >= date, RecipeDateLog.date < tomorrow_date).join(Recipe).all()
+
+        if recipe_dates:   
+            res = make_response(jsonify({'data': [{'id': recipe_date.recipe_id, 'name': recipe_date.recipe.name} for recipe_date in recipe_dates]}), 200)
+            return res
+
+        else:
+            res = make_response(jsonify({'data': None}), 204)
+            return res
+        
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
 
 
 @bp.route('/add_recipe_date', methods=['POST'])

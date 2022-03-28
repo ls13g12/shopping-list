@@ -61,24 +61,58 @@ function addDateRow(date){
 
     let tr = document.createElement('tr')
     let date_string = date.toLocaleDateString()
-    tr.setAttribute('id', date_string)
 
     let th = document.createElement('th')
     th.setAttribute('scope', 'row')
     th.classList.add('w-20', 'text-center')
-    th.setAttribute('scope', 'row')
     th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"})))
     th.appendChild(document.createElement('br'))
     th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))
     
     let td = document.createElement('td')
-    td.classList.add('w-40')
+    td.classList.add('w-80')
+    td.setAttribute('id', date_string)
     tr.appendChild(th)
     tr.appendChild(td)
     tableBody.appendChild(tr)
+
+    loadRecipesFromDatabase(td)
   
     addRecipeDropdownBox(td, date_string)
 }
+
+async function loadRecipesFromDatabase(td){
+    let div = document.createElement('div')
+    td.appendChild(div)
+    let date_string = td.id
+    var data = {
+        date_string: date_string
+    }
+    const res = await fetch('/get_recipes_for_date', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+        })
+        .then(async res => {
+            if(res.status == 200) return res.json()
+        })
+        .then(data => {
+            if (data){
+                let recipes = data.data
+                for(let i=0; i < recipes.length; i++){
+                    console.log(recipes[i].id)
+                    console.log(recipes[i].name)
+                    div.appendChild(document.createTextNode(recipes[i].name))
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+    })
+}
+
 
 //create recipe dropbox box for user to select all recipes
 async function addRecipeDropdownBox(td, date_string){
@@ -90,6 +124,15 @@ async function addRecipeDropdownBox(td, date_string){
     select.id = "select-recipe-" + date_string
     div.appendChild(select)
 
+    let option = document.createElement('option')
+    option.value = ""
+    option.disable = true
+    option.selected = true
+    option.innerHTML = "- select -"
+    select.appendChild(option)
+
+    addRecipeOptions(select)
+
     let button_div = document.createElement('div')
     button_div.classList.add('input-group-append')
     let button = document.createElement('button')
@@ -97,12 +140,15 @@ async function addRecipeDropdownBox(td, date_string){
     button.type = "button"
     button.innerHTML = "Add"
 
-    initialiseAddRecipeButton(button, select, date_string)
+    initialiseAddRecipeButton(button, select, td, date_string)
     
     button_div.appendChild(button)
     div.appendChild(button_div)
+    td.appendChild(div)
 
+}
 
+async function addRecipeOptions(select){
     const res = await fetch('/get_recipes', {
         method: 'POST',
         headers: {
@@ -115,8 +161,7 @@ async function addRecipeDropdownBox(td, date_string){
             for(let i=0; i < recipes.length; i++){
                 let option = createRecipeOption(recipes[i])
                 select.appendChild(option)
-            }
-            td.appendChild(div)
+            }    
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -130,18 +175,20 @@ function createRecipeOption(recipe){
     return option
 }
 
-function initialiseAddRecipeButton(button, select, date_string){
+function initialiseAddRecipeButton(button, select, td, date_string){
     button.addEventListener('click', function(event){
         event.stopPropagation()
         event.preventDefault()
 
         recipe_id = select.value
         
-        updateRecipe(recipe_id, date_string)
+        addRecipe(recipe_id, date_string)
+
+        loadRecipesFromDatabase(td)
     })
 }
 
-async function updateRecipe(recipe_id, date_string){
+async function addRecipe(recipe_id, date_string){
     var recipe_data = {
         recipe_id: recipe_id,
         date_string: date_string
