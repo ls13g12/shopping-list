@@ -57,34 +57,38 @@ function clearDateTable(){
 }
 
 function addDateRow(date){
+    let date_string = date.toLocaleDateString()   //dd/mm/yyyy format
     let tableBody = document.getElementById('calendar-table-body')
-
     let tr = document.createElement('tr')
-    let date_string = date.toLocaleDateString()
+    tableBody.appendChild(tr)
+
 
     let th = document.createElement('th')
     th.setAttribute('scope', 'row')
     th.classList.add('w-20', 'text-center')
-    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"})))
+    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"}))) //full weekday word
     th.appendChild(document.createElement('br'))
-    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))
+    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))  // dd/mm format
+    tr.appendChild(th)
     
     let td = document.createElement('td')
     td.classList.add('w-80')
     td.setAttribute('id', date_string)
-    tr.appendChild(th)
     tr.appendChild(td)
-    tableBody.appendChild(tr)
 
-    loadRecipesFromDatabase(td)
+    let ul = document.createElement('ul')
+    ul.id  = "recipe-list-" + date_string
+    td.appendChild(ul)
+    loadRecipesFromDatabase(date_string)
   
     addRecipeDropdownBox(td, date_string)
 }
 
-async function loadRecipesFromDatabase(td){
-    let div = document.createElement('div')
-    td.appendChild(div)
-    let date_string = td.id
+async function loadRecipesFromDatabase(date_string){
+    let ul_id = `recipe-list-${date_string}`
+    let ul = document.getElementById(ul_id)
+    ul.innerHTML = ""
+
     var data = {
         date_string: date_string
     }
@@ -102,9 +106,10 @@ async function loadRecipesFromDatabase(td){
             if (data){
                 let recipes = data.data
                 for(let i=0; i < recipes.length; i++){
-                    console.log(recipes[i].id)
-                    console.log(recipes[i].name)
-                    div.appendChild(document.createTextNode(recipes[i].name))
+                    let li = document.createElement('li')
+                    li.appendChild(document.createTextNode(recipes[i].name))
+                    li.classList.add('recipe-li')
+                    ul.appendChild(li)
                 }
             }
         })
@@ -112,7 +117,6 @@ async function loadRecipesFromDatabase(td){
             console.error('Error:', error);
     })
 }
-
 
 //create recipe dropbox box for user to select all recipes
 async function addRecipeDropdownBox(td, date_string){
@@ -140,7 +144,7 @@ async function addRecipeDropdownBox(td, date_string){
     button.type = "button"
     button.innerHTML = "Add"
 
-    initialiseAddRecipeButton(button, select, td, date_string)
+    initialiseAddRecipeButton(button, date_string)
     
     button_div.appendChild(button)
     div.appendChild(button_div)
@@ -175,16 +179,15 @@ function createRecipeOption(recipe){
     return option
 }
 
-function initialiseAddRecipeButton(button, select, td, date_string){
+function initialiseAddRecipeButton(button, date_string){
     button.addEventListener('click', function(event){
         event.stopPropagation()
         event.preventDefault()
-
+        let select_id = "select-recipe-" + date_string 
+        let select = document.getElementById(select_id)
         recipe_id = select.value
         
         addRecipe(recipe_id, date_string)
-
-        loadRecipesFromDatabase(td)
     })
 }
 
@@ -205,7 +208,7 @@ async function addRecipe(recipe_id, date_string){
                 const data = await res.json()
                 console.log(data.error)
             }
-            if(res.ok) console.log('success')
+            if(res.ok) loadRecipesFromDatabase(date_string)
         })
         .catch((error) => {
             console.error('Error:', error);

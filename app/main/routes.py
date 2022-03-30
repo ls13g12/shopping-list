@@ -213,11 +213,9 @@ def add_recipe_date():
         if recipe_dates:   
             for recipe_date in recipe_dates:
                 if recipe.id == recipe_date.recipe.id:
+                    #duplicates currently not permitted - increase quantity in future
                     res = make_response(jsonify({"error": "Recipe already added"}), 409)
                     return res
-                else:
-                    db.session.delete(recipe_date)
-                    db.session.commit()
 
         #add recipe_date to db
         recipe_date = RecipeDateLog(recipe_id=recipe.id, date = date)
