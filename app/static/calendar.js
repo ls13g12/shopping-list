@@ -13,12 +13,27 @@ $(document).ready( function() {
 
     loadCalendarView(startDate, endDate)
     initialiseSubmitButton()
+    initialiseEditButton()
 })
 
 function initialiseSubmitButton(){
     let button = document.getElementById('submit-dates-button')
     button.addEventListener('click', function(event){
         if (validateDates()) submitDates()
+    })
+}
+
+function initialiseEditButton(){
+    let toggleEditButton = document.getElementById('toggle-edit-button')
+    toggleEditButton.addEventListener('click', function(event){
+        event.preventDefault()
+        event.stopPropagation()
+
+        let inputDivs = Array.from(document.getElementsByClassName('input-group'))
+        inputDivs.forEach(function(inputDiv){
+            if (inputDiv.style.display === 'none') inputDiv.style.display = 'flex'
+            else inputDiv.style.display = 'none'
+        })
     })
 }
 
@@ -130,7 +145,7 @@ async function addRecipeDropdownBox(td, date_string){
 
     let option = document.createElement('option')
     option.value = ""
-    option.disable = true
+    option.disabled = true
     option.selected = true
     option.innerHTML = "- select -"
     select.appendChild(option)
@@ -149,6 +164,8 @@ async function addRecipeDropdownBox(td, date_string){
     button_div.appendChild(button)
     div.appendChild(button_div)
     td.appendChild(div)
+    //hidden upon page load
+    div.style.display = 'none'
 
 }
 
@@ -186,8 +203,7 @@ function initialiseAddRecipeButton(button, date_string){
         let select_id = "select-recipe-" + date_string 
         let select = document.getElementById(select_id)
         recipe_id = select.value
-        
-        addRecipe(recipe_id, date_string)
+        if (recipe_id) addRecipe(recipe_id, date_string)
     })
 }
 
