@@ -204,7 +204,7 @@ def add_recipe_date():
 
     date = datetime.strptime(date_string, "%d/%m/%Y")
     tomorrow_date = date + timedelta(days=1)
-
+    print('getting recipes')
 
     try:
         recipe = Recipe.query.filter_by(id=recipe_id).first()
@@ -226,6 +226,39 @@ def add_recipe_date():
         return res
 
 
+  
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
+
+
+@bp.route('/remove_recipe_date', methods=['POST'])
+def remove_recipe_date():
+    #lower case recipe name from fetch request body
+    req = request.get_json()
+    recipe_id = req['recipe_id']
+    date_string = req['date_string']
+
+    date = datetime.strptime(date_string, "%d/%m/%Y")
+    tomorrow_date = date + timedelta(days=1)
+
+    print('removing recipes')
+
+    try:
+        recipe = Recipe.query.filter_by(id=recipe_id).first()
+        recipe_dates = RecipeDateLog.query.filter_by(recipe_id=recipe.id).filter(RecipeDateLog.date >= date, RecipeDateLog.date < tomorrow_date).all()
+
+        if recipe_dates:   
+            for recipe_date in recipe_dates:
+                db.session.delete(recipe_date)
+            db.session.commit()
+            res = make_response(jsonify({}), 204)
+            return res
+
+        #duplicates currently not permitted - increase quantity in future
+        res = make_response(jsonify({"error": "Recipe doesn't exist for date"}), 409)
+        return res
   
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])

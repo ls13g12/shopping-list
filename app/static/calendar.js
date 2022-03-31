@@ -25,15 +25,33 @@ function initialiseSubmitButton(){
 
 function initialiseEditButton(){
     let toggleEditButton = document.getElementById('toggle-edit-button')
+    toggleEditButton.value = "false"
     toggleEditButton.addEventListener('click', function(event){
         event.preventDefault()
         event.stopPropagation()
 
+        let toggleEditButton = document.getElementById('toggle-edit-button')
+        if (toggleEditButton.value == "false") {
+            toggleEditButton.value = "true"
+        }
+        else {toggleEditButton.value = "false"}
+
+        console.log(toggleEditButton.value)
+
         let inputDivs = Array.from(document.getElementsByClassName('input-group'))
         inputDivs.forEach(function(inputDiv){
-            if (inputDiv.style.display === 'none') inputDiv.style.display = 'flex'
-            else inputDiv.style.display = 'none'
+            if (toggleEditButton.value == "false") inputDiv.style.display = 'none'
+            else inputDiv.style.display = 'flex'
         })
+
+        let removeButtonSpans = Array.from(document.getElementsByClassName('remove-button-span'))
+        removeButtonSpans.forEach(function(removeButtonSpan){
+            if (toggleEditButton.value == "false") removeButtonSpan.style.display = 'none'
+            else removeButtonSpan.style.display = 'inline'
+            
+            console.log(removeButtonSpan)
+        })
+
     })
 }
 
@@ -100,9 +118,6 @@ function addDateRow(date){
 }
 
 async function loadRecipesFromDatabase(date_string){
-    let ul_id = `recipe-list-${date_string}`
-    let ul = document.getElementById(ul_id)
-    ul.innerHTML = ""
 
     var data = {
         date_string: date_string
@@ -120,16 +135,56 @@ async function loadRecipesFromDatabase(date_string){
         .then(data => {
             if (data){
                 let recipes = data.data
-                for(let i=0; i < recipes.length; i++){
-                    let li = document.createElement('li')
-                    li.appendChild(document.createTextNode(recipes[i].name))
-                    li.classList.add('recipe-li')
-                    ul.appendChild(li)
+                if (recipes){
+                    updateRecipeList(date_string, recipes)
+                    }
                 }
-            }
-        })
+            else emptyRecipeList(date_string)
+            })
         .catch((error) => {
             console.error('Error:', error);
+    })
+}
+
+function emptyRecipeList(date_string){
+    let ul_id = `recipe-list-${date_string}`
+    let ul = document.getElementById(ul_id)
+    ul.innerHTML = ""
+}
+
+function updateRecipeList(date_string, recipes){
+    let ul_id = `recipe-list-${date_string}`
+    let ul = document.getElementById(ul_id)
+    ul.innerHTML = ""
+    for(let i=0; i < recipes.length; i++){
+        let li = document.createElement('li')
+        li.appendChild(document.createTextNode(recipes[i].name))
+        li.classList.add('recipe-li')
+        ul.appendChild(li)
+        addRemoveRecipeButton(li, date_string, recipes[i].id)
+    }
+}
+
+function addRemoveRecipeButton(li, date_string, recipe_id){
+    let span = document.createElement('span')
+    let button = document.createElement('button')
+    button.innerHTML = 'X'
+    button.id = "remove-recipe-" + recipe_id + "-" + date_string
+    span.appendChild(button)
+    li.appendChild(span)
+    span.classList.add('remove-button-span')
+
+    let toggleEditButton = document.getElementById('toggle-edit-button')
+    if(toggleEditButton.value == "false") span.style.display = 'none'
+
+    initialiseRemoveRecipeButton(button, date_string, recipe_id)
+}
+
+function initialiseRemoveRecipeButton(button, date_string, recipe_id){
+    button.addEventListener('click', function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        removeRecipeFromDate(recipe_id, date_string)
     })
 }
 
@@ -213,6 +268,30 @@ async function addRecipe(recipe_id, date_string){
         date_string: date_string
     }
     const res = await fetch('/add_recipe_date', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipe_data)
+        })
+        .then(async res => {
+            if(!res.ok){
+                const data = await res.json()
+                console.log(data.error)
+            }
+            if(res.ok) loadRecipesFromDatabase(date_string)
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+    })
+}
+
+async function removeRecipeFromDate(recipe_id, date_string){
+    var recipe_data = {
+        recipe_id: recipe_id,
+        date_string: date_string
+    }
+    const res = await fetch('/remove_recipe_date', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
