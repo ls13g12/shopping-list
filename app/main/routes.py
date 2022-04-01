@@ -2,7 +2,7 @@ from flask import render_template, make_response, jsonify, request
 from pendulum import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
-from app.models import Item, Recipe, RecipeDateLog, RecipeItem
+from app.models import Item, Recipe, RecipeDateLog, RecipeItem, SelectedDatesLog
 from app.main import bp
 from datetime import datetime, timedelta
 
@@ -10,20 +10,29 @@ from datetime import datetime, timedelta
 @bp.route('/')
 @bp.route('/list')
 def list():
-    recipe_items = RecipeItem.query.join(Item).all()
+    dates = SelectedDatesLog.query.order_by(SelectedDatesLog.timestamp.desc()).first()
+
+    recipe_dates = RecipeDateLog.query.filter(RecipeDateLog.date >= dates.start_date, RecipeDateLog.date <= dates.end_date).all()
     items = []
 
-    for recipe_item in recipe_items:
-        item_data = {'name': recipe_item.item.name, 'quantity': recipe_item.quantity}
+    for recipe_date in recipe_dates:
+        print(recipe_date)
+        recipe_items = RecipeItem.query.filter_by(recipe_id=recipe_date.recipe_id).join(Item).all()
 
-        if item_data in items:
-            index = items.index(item_data)
-            items[index]['quantity'] += recipe_item.quantity
+        for recipe_item in recipe_items:
         
-        else:
-            items.append(item_data)
+            item_data = {'name': recipe_item.item.name, 'quantity': recipe_item.quantity}
+
+            if item_data in items:
+                index = items.index(item_data)
+                items[index]['quantity'] += recipe_item.quantity
             
-    return render_template('list.html', items=items)
+            else:
+                items.append(item_data)
+                
+    dates = {'start_date': dates.start_date.strftime("%m/%d/%Y"), 'end_date': dates.end_date.strftime("%m/%d/%Y")}
+        
+    return render_template('list.html', items=items, dates=dates)
 
 @bp.route('/recipes')
 def recipes():
@@ -204,7 +213,6 @@ def add_recipe_date():
 
     date = datetime.strptime(date_string, "%d/%m/%Y")
     tomorrow_date = date + timedelta(days=1)
-    print('getting recipes')
 
     try:
         recipe = Recipe.query.filter_by(id=recipe_id).first()
@@ -243,8 +251,6 @@ def remove_recipe_date():
     date = datetime.strptime(date_string, "%d/%m/%Y")
     tomorrow_date = date + timedelta(days=1)
 
-    print('removing recipes')
-
     try:
         recipe = Recipe.query.filter_by(id=recipe_id).first()
         recipe_dates = RecipeDateLog.query.filter_by(recipe_id=recipe.id).filter(RecipeDateLog.date >= date, RecipeDateLog.date < tomorrow_date).all()
@@ -265,4 +271,30 @@ def remove_recipe_date():
         res = make_response(jsonify({"error": error}), 500)
         return res
 
+
+@bp.route('/select_new_dates', methods=['POST'])
+def select_new_date():
+    #lower case recipe name from fetch request body
+    req = request.get_json()
+    start_date = req['start_date']
+    end_date = req['end_date']
+    print(type(start_date))
+
+    start_date = datetime.strptime(start_date, "%d/%m/%Y")
+    end_date = datetime.strptime(end_date, "%d/%m/%Y")
+
+
+    try:
+        selected_dates = SelectedDatesLog(start_date=start_date, end_date=end_date)
+        db.session.add(selected_dates)
+        db.session.commit()
+
+        #duplicates currently not permitted - increase quantity in future
+        res = make_response(jsonify({}), 200)
+        return res
+  
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
 

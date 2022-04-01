@@ -67,11 +67,37 @@ function validateDates(){
 
 }
 
-function submitDates(){
+async function submitDates(){
     let startDate = new Date(document.getElementById('start-date').value)
     let endDate = new Date(document.getElementById('end-date').value)
+    await selectNewDates(startDate, endDate)
+}
 
-    loadCalendarView(startDate, endDate)
+async function selectNewDates(startDate, endDate){
+    var data = {
+        start_date: startDate.toLocaleDateString(),
+        end_date: endDate.toLocaleDateString() 
+    }
+    const res = await fetch('/select_new_dates', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+        })
+        .then(async res => {
+            if(res.status >= 200 && res.status < 300) return res.json()
+            else{
+                const data = await res.json()
+                console.log(data.error)
+            }
+        })
+        .then(function(){          
+            loadCalendarView(startDate, endDate)
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+    })
 }
 
 function loadCalendarView(startDate, endDate){

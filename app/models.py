@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 
 class Item(db.Model):
@@ -30,4 +31,10 @@ class RecipeDateLog(db.Model):
     date = db.Column(db.DateTime())
     recipe_id = db.Column(db.Integer(), db.ForeignKey('recipe.id'))
     quantity = db.Column(db.Integer, default=1)
+
+class SelectedDatesLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(db.DateTime())
+    end_date = db.Column(db.DateTime())
+    timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
