@@ -36,8 +36,6 @@ function initialiseEditButton(){
         }
         else {toggleEditButton.value = "false"}
 
-        console.log(toggleEditButton.value)
-
         let inputDivs = Array.from(document.getElementsByClassName('input-group'))
         inputDivs.forEach(function(inputDiv){
             if (toggleEditButton.value == "false") inputDiv.style.display = 'none'
@@ -48,10 +46,22 @@ function initialiseEditButton(){
         removeButtonSpans.forEach(function(removeButtonSpan){
             if (toggleEditButton.value == "false") removeButtonSpan.style.display = 'none'
             else removeButtonSpan.style.display = 'inline'
-            
-            console.log(removeButtonSpan)
         })
+    })
+}
 
+function hideEditModeElements(){
+    let toggleEditButton = document.getElementById('toggle-edit-button')
+    toggleEditButton.value = "false"
+
+    let inputDivs = Array.from(document.getElementsByClassName('input-group'))
+    inputDivs.forEach(function(inputDiv){
+        inputDiv.style.display = 'none'
+    })
+
+    let removeButtonSpans = Array.from(document.getElementsByClassName('remove-button-span'))
+    removeButtonSpans.forEach(function(removeButtonSpan){
+        removeButtonSpan.style.display = 'none'
     })
 }
 
@@ -94,6 +104,7 @@ async function selectNewDates(startDate, endDate){
         })
         .then(function(){          
             loadCalendarView(startDate, endDate)
+            hideEditModeElements()
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -103,7 +114,6 @@ async function selectNewDates(startDate, endDate){
 function loadCalendarView(startDate, endDate){
     let date = startDate
     clearDateTable()
-    //createDateTable();
     while(date <= endDate){
         addDateRow(date)
         date.setDate(date.getDate() + 1)
