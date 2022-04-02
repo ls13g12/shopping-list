@@ -16,7 +16,6 @@ def list():
     items = []
 
     for recipe_date in recipe_dates:
-        print(recipe_date)
         recipe_items = RecipeItem.query.filter_by(recipe_id=recipe_date.recipe_id).join(Item).all()
 
         for recipe_item in recipe_items:
