@@ -223,7 +223,6 @@ async function update_recipe_items(recipe_element_id){
     input.classList.add("add-item-input")
     li.appendChild(input)
     recipe_items_div.appendChild(li)
-    input.focus()
 
     initialise_enter_keydown_items(recipe_element_id, add_item_to_recipe_input_id)
 }

@@ -24,8 +24,8 @@
 
     <body>
 
-        <nav class="navbar sticky-top navbar-expand navbar-light bg-light">
-              <ul class="nav navbar-nav">
+        <nav class="navbar fixed-bottom navbar-expand navbar-light bg-light">
+              <ul class="nav navbar-nav mx-auto">
                 <li class="nav-item"><a class="nav-link" href="/list">List</a></li>
                 <li class="nav-item"><a class="nav-link" href="/recipes">Recipes</a></li>
                 <li class="nav-item"><a class="nav-link" href="/calendar">Calendar</a></li>
@@ -37,3 +37,12 @@
         
     </body>
 </html>
+
+<style>
+.container{
+    padding-bottom: 40px;
+}
+.nav-item:not(:first-child){
+    padding-left: 50px;
+}
+</style>

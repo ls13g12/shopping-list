@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div>
+<div class="container" max-width="200px">
         <div class="dates-container">
                 <div class="date-input">
                         <label for="start-date">Start</label>
@@ -15,12 +15,22 @@
         </div>
         <button id="submit-dates-button">Submit</button>
         <br>
-        <button id="toggle-edit-button">Edit Mode On/Off</button>
+
         <br>
 
 
         <div id="calendar-view-div">
                 <table class="table table-bordered table-striped">
+                        <thead>
+                                <tr>
+                                        <th class="text-center">
+                                                Dates
+                                        </th>
+                                        <td>
+                                                <button id="toggle-edit-button">Edit Mode On/Off</button>
+                                        </td>
+                                </tr>
+                        </thead> 
                         <tbody id="calendar-table-body">
                                 <tr>
                                         <th></th>
@@ -78,18 +88,18 @@ div .recipe-div {
         float: right;
 }
 ul {
-  list-style-type: none;
-  padding: 0;
+        list-style-type: none;
+        padding: 0;
 
 }
 ul li.recipe-li {
-  padding: 6px 12px;
-  margin: 5px;
-  justify-content: space-between;
-  border: 1px solid rgb(179, 179, 179);
-  border-radius: 4px;
-  font-size: 1em;
-  background-color: white;
+        padding: 6px 12px;
+        margin: 5px;
+        justify-content: space-between;
+        border: 1px solid rgb(179, 179, 179);
+        border-radius: 4px;
+        font-size: 1em;
+        background-color: white;
 }
 div .input-group{
         padding: 5px;
@@ -100,7 +110,10 @@ table .w-20 {
 }
 table .w-80 { 
         width:80%; 
-        }
+}
+th{
+
+}
 </style>
 
 {% endblock %}
