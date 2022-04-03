@@ -2,23 +2,17 @@
 
 {% block content %}
 
-<div class="container" max-width="200px">
-        <div class="dates-container">
-                <div class="date-input">
-                        <label for="start-date">Start</label>
-                        <input id="start-date" type="date">
-                </div>
-                <div class="date-input">
-                        <label for="end-date">End</label>
-                        <input id="end-date" type="date">
-                </div>
-        </div>
-        <button id="submit-dates-button">Submit</button>
-        <br>
+<nav class="navbar navbar-expand navbar-light bg-light">
+        <ul class="nav navbar-nav mx-auto ">
+                <li class="nav-item dates"><input id="start-date" type="date"></li>
+                <li class="nav-item dates"><label for="end-date"> to </label></li>
+                <li class="nav-item dates"><input id="end-date" type="date"></li>
+                <li class="nav-item dates"><button id="submit-dates-button">OK</button></li>
+        </ul>
 
-        <br>
+</nav>
 
-
+<div class="container">
         <div id="calendar-view-div">
                 <table class="table table-bordered table-striped">
                         <thead>
@@ -32,11 +26,7 @@
                                 </tr>
                         </thead> 
                         <tbody id="calendar-table-body">
-                                <tr>
-                                        <th></th>
-                                       
- <td></td>
-                                </tr>
+
                         </tbody>
                 </table>
         </div>
@@ -51,34 +41,18 @@
 .btn-outline-secondary{
         background-color: white;
 }
-label{
-        font-size: 20px;
-        margin: 0px;
-        padding: 0px;
-}
-#submit-dates-button, #toggle-edit-button{
-        position: relative;
-        left: 50%;
-        transform: translate(-55%, 0%);
-        margin: 5px;
-}
-div .dates-container{
-        display: flex;
-        justify-content: center;
-}
-div .date-input{
-        padding: 5px;
-        max-width: 45%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        justify-items: center;
-        text-align: center;
+body{
+        background-color: transparent;
 }
 #start-date, #end-date{
-        height: 30px;
-        width: 100%;
+        width: 120px;
 }
+
+.dates:not(:first-child){
+        justify-content: space-around;
+        padding-left: 10px;
+}
+
 div .recipe-div {
         height: 40px;
         background-color: grey;
@@ -110,9 +84,6 @@ table .w-20 {
 }
 table .w-80 { 
         width:80%; 
-}
-th{
-
 }
 </style>
 
