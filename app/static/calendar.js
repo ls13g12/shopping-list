@@ -13,55 +13,12 @@ $(document).ready( function() {
 
     loadCalendarView(startDate, endDate)
     initialiseSubmitButton()
-    initialiseEditButton()
 })
 
 function initialiseSubmitButton(){
     let button = document.getElementById('submit-dates-button')
     button.addEventListener('click', function(event){
         if (validateDates()) submitDates()
-    })
-}
-
-function initialiseEditButton(){
-    let toggleEditButton = document.getElementById('toggle-edit-button')
-    toggleEditButton.value = "false"
-    toggleEditButton.addEventListener('click', function(event){
-        event.preventDefault()
-        event.stopPropagation()
-
-        let toggleEditButton = document.getElementById('toggle-edit-button')
-        if (toggleEditButton.value == "false") {
-            toggleEditButton.value = "true"
-        }
-        else {toggleEditButton.value = "false"}
-
-        let inputDivs = Array.from(document.getElementsByClassName('input-group'))
-        inputDivs.forEach(function(inputDiv){
-            if (toggleEditButton.value == "false") inputDiv.style.display = 'none'
-            else inputDiv.style.display = 'flex'
-        })
-
-        let removeButtonSpans = Array.from(document.getElementsByClassName('remove-button-span'))
-        removeButtonSpans.forEach(function(removeButtonSpan){
-            if (toggleEditButton.value == "false") removeButtonSpan.style.display = 'none'
-            else removeButtonSpan.style.display = 'inline'
-        })
-    })
-}
-
-function hideEditModeElements(){
-    let toggleEditButton = document.getElementById('toggle-edit-button')
-    toggleEditButton.value = "false"
-
-    let inputDivs = Array.from(document.getElementsByClassName('input-group'))
-    inputDivs.forEach(function(inputDiv){
-        inputDiv.style.display = 'none'
-    })
-
-    let removeButtonSpans = Array.from(document.getElementsByClassName('remove-button-span'))
-    removeButtonSpans.forEach(function(removeButtonSpan){
-        removeButtonSpan.style.display = 'none'
     })
 }
 
@@ -104,7 +61,6 @@ async function selectNewDates(startDate, endDate){
         })
         .then(function(){          
             loadCalendarView(startDate, endDate)
-            hideEditModeElements()
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -121,36 +77,31 @@ function loadCalendarView(startDate, endDate){
 }
 
 function clearDateTable(){
-    let tableBody = document.getElementById('calendar-table-body')
-    tableBody.innerHTML = ""
+    let daysContainer = document.getElementById('days-container')
+    daysContainer.innerHTML = ""
 }
 
 function addDateRow(date){
     let date_string = date.toLocaleDateString()   //dd/mm/yyyy format
-    let tableBody = document.getElementById('calendar-table-body')
-    let tr = document.createElement('tr')
-    tableBody.appendChild(tr)
+    let daysContainer = document.getElementById('days-container')
+    let dayDiv = document.createElement('div')
+    dayDiv.classList.add('day-div')
+    daysContainer.appendChild(dayDiv)
 
 
-    let th = document.createElement('th')
-    th.setAttribute('scope', 'row')
-    th.classList.add('w-20', 'text-center')
-    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"}))) //full weekday word
-    th.appendChild(document.createElement('br'))
-    th.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { day:"numeric", month:"numeric"})))  // dd/mm format
-    tr.appendChild(th)
+    let dayTitleDiv = document.createElement('div')
+    dayDiv.append(dayTitleDiv)
+    dayTitleDiv.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"}))) //full weekday word
+    dayTitleDiv.appendChild(document.createTextNode(" " + date.toLocaleDateString('en-uk', { day:"numeric", month:"long"})))  // dd/mm format
     
-    let td = document.createElement('td')
-    td.classList.add('w-80')
-    td.setAttribute('id', date_string)
-    tr.appendChild(td)
-
+    let dayRecipesDiv = document.createElement('div')
+    dayDiv.appendChild(dayRecipesDiv)
     let ul = document.createElement('ul')
     ul.id  = "recipe-list-" + date_string
-    td.appendChild(ul)
+    dayRecipesDiv.appendChild(ul)
     loadRecipesFromDatabase(date_string)
   
-    addRecipeDropdownBox(td, date_string)
+    addRecipeDropdownBox(dayTitleDiv, date_string)
 }
 
 async function loadRecipesFromDatabase(date_string){
@@ -210,9 +161,6 @@ function addRemoveRecipeButton(li, date_string, recipe_id){
     li.appendChild(span)
     span.classList.add('remove-button-span')
 
-    let toggleEditButton = document.getElementById('toggle-edit-button')
-    if(toggleEditButton.value == "false") span.style.display = 'none'
-
     initialiseRemoveRecipeButton(button, date_string, recipe_id)
 }
 
@@ -225,7 +173,7 @@ function initialiseRemoveRecipeButton(button, date_string, recipe_id){
 }
 
 //create recipe dropbox box for user to select all recipes
-async function addRecipeDropdownBox(td, date_string){
+async function addRecipeDropdownBox(dayTitleDiv, date_string){
     let div = document.createElement('div')
     div.classList.add('input-group')
     let select = document.createElement('select')
@@ -254,9 +202,7 @@ async function addRecipeDropdownBox(td, date_string){
     
     button_div.appendChild(button)
     div.appendChild(button_div)
-    td.appendChild(div)
-    //hidden upon page load
-    div.style.display = 'none'
+    dayTitleDiv.appendChild(div)
 
 }
 
