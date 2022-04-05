@@ -90,11 +90,13 @@ function addDateRow(date){
 
 
     let dayTitleDiv = document.createElement('div')
+    dayTitleDiv.classList.add("day-title-div")
     dayDiv.append(dayTitleDiv)
     dayTitleDiv.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"}))) //full weekday word
     dayTitleDiv.appendChild(document.createTextNode(" " + date.toLocaleDateString('en-uk', { day:"numeric", month:"long"})))  // dd/mm format
     
     let dayRecipesDiv = document.createElement('div')
+    dayRecipesDiv.classList.add("day-recipes-div")
     dayDiv.appendChild(dayRecipesDiv)
     let ul = document.createElement('ul')
     ul.id  = "recipe-list-" + date_string
@@ -174,35 +176,23 @@ function initialiseRemoveRecipeButton(button, date_string, recipe_id){
 
 //create recipe dropbox box for user to select all recipes
 async function addRecipeDropdownBox(dayTitleDiv, date_string){
-    let div = document.createElement('div')
-    div.classList.add('input-group')
+    let span = document.createElement('span')
+    span.classList.add("dropdown-span")
     let select = document.createElement('select')
-    select.classList.add("custom-select")
-    select.setAttribute('style', 'width:60%')
+    select.classList.add("select-recipes")
     select.id = "select-recipe-" + date_string
-    div.appendChild(select)
+    span.appendChild(select)
 
     let option = document.createElement('option')
     option.value = ""
     option.disabled = true
     option.selected = true
-    option.innerHTML = "- select -"
+    option.innerHTML = "Add"
     select.appendChild(option)
 
     addRecipeOptions(select)
-
-    let button_div = document.createElement('div')
-    button_div.classList.add('input-group-append')
-    let button = document.createElement('button')
-    button.classList.add('btn', 'btn-outline-secondary')
-    button.type = "button"
-    button.innerHTML = "Add"
-
-    initialiseAddRecipeButton(button, date_string)
     
-    button_div.appendChild(button)
-    div.appendChild(button_div)
-    dayTitleDiv.appendChild(div)
+    dayTitleDiv.appendChild(span)
 
 }
 
