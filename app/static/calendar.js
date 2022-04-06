@@ -92,8 +92,11 @@ function addDateRow(date){
     let dayTitleDiv = document.createElement('div')
     dayTitleDiv.classList.add("day-title-div")
     dayDiv.append(dayTitleDiv)
-    dayTitleDiv.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"}))) //full weekday word
-    dayTitleDiv.appendChild(document.createTextNode(" " + date.toLocaleDateString('en-uk', { day:"numeric", month:"long"})))  // dd/mm format
+    let weekDaySpan = document.createElement('span')
+    weekDaySpan.setAttribute("style", "font-weight: bold")
+    dayTitleDiv.appendChild(weekDaySpan)
+    weekDaySpan.appendChild(document.createTextNode(date.toLocaleDateString('en-uk', { weekday:"long"}))) //full weekday word
+    dayTitleDiv.appendChild(document.createTextNode(" | " + date.toLocaleDateString('en-uk', { day:"numeric", month:"long"})))  // dd/mm format
     
     let dayRecipesDiv = document.createElement('div')
     dayRecipesDiv.classList.add("day-recipes-div")
@@ -184,7 +187,7 @@ async function addRecipeDropdownBox(dayTitleDiv, date_string){
     span.appendChild(select)
 
     let option = document.createElement('option')
-    option.value = ""
+    option.value = "0"
     option.disabled = true
     option.selected = true
     option.innerHTML = "Add"
@@ -193,6 +196,8 @@ async function addRecipeDropdownBox(dayTitleDiv, date_string){
     addRecipeOptions(select)
     
     dayTitleDiv.appendChild(span)
+
+    initialiseAddRecipe(select, date_string)
 
 }
 
@@ -223,14 +228,13 @@ function createRecipeOption(recipe){
     return option
 }
 
-function initialiseAddRecipeButton(button, date_string){
-    button.addEventListener('click', function(event){
+function initialiseAddRecipe(select, date_string){
+    select.addEventListener('change', function(event){
         event.stopPropagation()
         event.preventDefault()
-        let select_id = "select-recipe-" + date_string 
-        let select = document.getElementById(select_id)
         recipe_id = select.value
         if (recipe_id) addRecipe(recipe_id, date_string)
+        select.value = "0"
     })
 }
 
