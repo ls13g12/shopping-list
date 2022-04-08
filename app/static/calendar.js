@@ -159,18 +159,22 @@ function updateRecipeList(date_string, recipes){
 
 function addRemoveRecipeButton(li, date_string, recipe_id){
     let span = document.createElement('span')
-    let button = document.createElement('button')
-    button.innerHTML = 'X'
-    button.id = "remove-recipe-" + recipe_id + "-" + date_string
-    span.appendChild(button)
+    let img = document.createElement('img')
+    img.setAttribute("src", "../static/images/trashcan_icon.png")
+    img.setAttribute("alt", "remove")
+    img.setAttribute("width", "24px")
+    img.setAttribute("height", "24px")
+    img.classList.add("remove-icon")
+    img.id = "remove-recipe-" + recipe_id + "-" + date_string
+    span.appendChild(img)
     li.appendChild(span)
     span.classList.add('remove-button-span')
 
-    initialiseRemoveRecipeButton(button, date_string, recipe_id)
+    initialiseRemoveRecipeButton(img, date_string, recipe_id)
 }
 
-function initialiseRemoveRecipeButton(button, date_string, recipe_id){
-    button.addEventListener('click', function(event){
+function initialiseRemoveRecipeButton(img, date_string, recipe_id){
+    img.addEventListener('click', function(event){
         event.preventDefault()
         event.stopPropagation()
         removeRecipeFromDate(recipe_id, date_string)

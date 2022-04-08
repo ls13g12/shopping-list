@@ -3,11 +3,11 @@
 {% block content %}
 
 <nav class="navbar navbar-expand navbar-light bg-light">
-        <ul class="nav navbar-nav mx-auto ">
+        <ul class="nav navbar-nav mx-auto dates-nav">
                 <li class="nav-item dates"><input id="start-date" type="date"></li>
-                <li class="nav-item dates"><label for="end-date"> to </label></li>
+                <li class="nav-item dates"><label for="end-date" class="to-label"> to </label></li>
                 <li class="nav-item dates"><input id="end-date" type="date"></li>
-                <li class="nav-item dates"><button id="submit-dates-button">OK</button></li>
+                <li class="nav-item dates"><button class="btn btn-dark btn-sm" id="submit-dates-button">OK</button></li>
         </ul>
 
 </nav>
@@ -20,14 +20,12 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename = 'calendar.js') }}"></script>
 <style>
-body{
-        background-color: rgb(240, 240, 240);
-}
+
 
 .day-div{
         margin: 5px;
         background-color: white;
-        padding: 10px;
+        padding: 8px;
         border-radius: 5px;
 }
 .dropdown-span{
@@ -39,26 +37,29 @@ body{
         border: None;
         background-color: white;
 }
-.btn{
-        font-size: 0.8em;
-        padding: 0px;
+.dates-nav{      
+        justify-content: space-between;
 }
-.btn-outline-secondary{
-        background-color: white;
-}
-
 #start-date, #end-date{
         width: 120px;
 }
-
-.dates:not(:first-child){
-        justify-content: space-around;
-        padding-left: 10px;
+.to-label{
+        padding-top: 6px;
 }
-
+.dates{
+        display: flex;
+        padding: 0px 0px 0px 0px;
+        margin: 3px;
+}
 .remove-button-span{
         display: inline;
         float: right;
+        padding-right: 10px;
+}
+img .remove-icon{
+        display: inline-block;
+        height:24px;
+        width:24px;
 }
 ul {
         list-style-type: none;
@@ -74,11 +75,6 @@ ul li.recipe-li {
         border-radius: 0px;
         font-size: 1.2em;
         background-color: white;
-}
-
-div .input-group{
-        padding: 5px;
-        border-radius: 8px;
 }
 
 </style>
