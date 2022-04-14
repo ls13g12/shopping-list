@@ -1,4 +1,4 @@
-from flask import render_template, make_response, jsonify, request
+from flask import render_template, redirect,url_for, make_response, jsonify, request
 from pendulum import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
@@ -12,22 +12,7 @@ from datetime import datetime, timedelta
 def list():
     dates = SelectedDatesLog.query.order_by(SelectedDatesLog.timestamp.desc()).first()
 
-    recipe_dates = RecipeDateLog.query.filter(RecipeDateLog.date >= dates.start_date, RecipeDateLog.date <= dates.end_date).all()
-    items = []
-
-    for recipe_date in recipe_dates:
-        recipe_items = RecipeItem.query.filter_by(recipe_id=recipe_date.recipe_id).join(Item).all()
-
-        for recipe_item in recipe_items:
-        
-            item_data = {'name': recipe_item.item.name, 'quantity': recipe_item.quantity}
-
-            if item_data in items:
-                index = items.index(item_data)
-                items[index]['quantity'] += recipe_item.quantity
-            
-            else:
-                items.append(item_data)
+    items = get_items_for_dates(dates)
                 
     dates = {'start_date': dates.start_date.strftime("%m/%d/%Y"), 'end_date': dates.end_date.strftime("%m/%d/%Y")}
         
@@ -49,6 +34,42 @@ def recipes():
 def calendar():
     return render_template('calendar.html')
 
+
+def get_items_for_dates(dates):
+    recipe_dates = RecipeDateLog.query.filter(RecipeDateLog.date >= dates.start_date, RecipeDateLog.date <= dates.end_date).all()
+    items = []
+
+    for recipe_date in recipe_dates:
+        recipe_items = RecipeItem.query.filter_by(recipe_id=recipe_date.recipe_id).join(Item).all()
+
+        for recipe_item in recipe_items:
+        
+            item_data = {'name': recipe_item.item.name, 'quantity': recipe_item.quantity}
+
+            if item_data in items:
+                index = items.index(item_data)
+                items[index]['quantity'] += recipe_item.quantity
+            
+            else:
+                items.append(item_data)
+    return items
+
+
+@bp.route('/get_selected_dates', methods=['POST'])
+def get_selected_dates():
+
+    try:
+        dates = SelectedDatesLog.query.order_by(SelectedDatesLog.timestamp.desc()).first()
+        if dates:
+            dates = {'start_date': dates.start_date.strftime("%m/%d/%Y"), 'end_date': dates.end_date.strftime("%m/%d/%Y")}
+            res = make_response(jsonify({'dates': dates}), 200)
+            print(res)
+            return res
+  
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
 
 @bp.route('/get_recipes', methods=['POST'])
 def get_recipes():
@@ -272,13 +293,11 @@ def remove_recipe_date():
 
 
 @bp.route('/select_new_dates', methods=['POST'])
-def select_new_date():
+def select_new_dates():
     #lower case recipe name from fetch request body
     req = request.get_json()
     start_date = req['start_date']
     end_date = req['end_date']
-    print(type(start_date))
-
     start_date = datetime.strptime(start_date, "%d/%m/%Y")
     end_date = datetime.strptime(end_date, "%d/%m/%Y")
 
@@ -296,4 +315,27 @@ def select_new_date():
         error = str(e.__dict__['orig'])
         res = make_response(jsonify({"error": error}), 500)
         return res
+
+@bp.route('/select_new_dates_items', methods=['POST'])
+def select_new_dates_items():
+    #lower case recipe name from fetch request body
+    req = request.get_json()
+    start_date = req['start_date']
+    end_date = req['end_date']
+    start_date = datetime.strptime(start_date, "%d/%m/%Y")
+    end_date = datetime.strptime(end_date, "%d/%m/%Y")
+
+    try:
+        selected_dates = SelectedDatesLog(start_date=start_date, end_date=end_date)
+        db.session.add(selected_dates)
+        db.session.commit()
+
+        #duplicates currently not permitted - increase quantity in future
+        return redirect(url_for('main.list'))
+  
+    except SQLAlchemyError as e:
+        error = str(e.__dict__['orig'])
+        res = make_response(jsonify({"error": error}), 500)
+        return res
+
 

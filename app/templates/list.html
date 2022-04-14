@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+<nav class="navbar navbar-expand navbar-light">
+        <ul class="nav navbar-nav mx-auto dates-nav">
+                <li class="nav-item dates"><input id="start-date" type="date"></li>
+                <li class="nav-item dates"><label for="end-date" class="to-label"> to </label></li>
+                <li class="nav-item dates"><input id="end-date" type="date"></li>
+                <li class="nav-item dates"><button class="btn btn-dark btn-sm" id="submit-dates-button">OK</button></li>
+        </ul>
+
+</nav>
 <div class="container" >
-        <div>
-                <h3> start date {{dates.start_date}}</h3>
-                <h3> end date {{dates.end_date}}</h3>
-        </div>
         <ul class="list-group">
         {% for item in items %}
         <li class="list-group-item">{{item.name}}

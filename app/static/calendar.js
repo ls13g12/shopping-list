@@ -5,13 +5,7 @@ Date.prototype.toDateInputValue = (function() {
 });
 
 $(document).ready( function() {
-    let startDate = new Date()
-    $('#start-date').val(startDate.toDateInputValue())
-    let endDate = new Date()
-    endDate.setDate(endDate.getDate() + 7)
-    $('#end-date').val(endDate.toDateInputValue())
-
-    loadCalendarView(startDate, endDate)
+    getSelectedDates()
     initialiseSubmitButton()
 })
 
@@ -19,6 +13,32 @@ function initialiseSubmitButton(){
     let button = document.getElementById('submit-dates-button')
     button.addEventListener('click', function(event){
         if (validateDates()) submitDates()
+    })
+}
+
+async function getSelectedDates(){
+    const res = await fetch('/get_selected_dates', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        })
+        .then(async res => {
+            if(res.status >= 200 && res.status < 300) return res.json()
+            else{
+                const data = await res.json()
+                console.log(data.error)
+            }
+        })
+        .then(data => {
+            startDate = new Date(data.dates.start_date)
+            endDate = new Date(data.dates.end_date)
+            $('#start-date').val(startDate.toDateInputValue())
+            $('#end-date').val(endDate.toDateInputValue())
+            loadCalendarView(startDate, endDate)
+        })
+        .catch((error) => {
+            console.error('Error:', error);
     })
 }
 

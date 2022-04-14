@@ -81,14 +81,17 @@ async function update_recipe_list(){
             recipe_list_div.appendChild(a)
 
             //delete button on right of list element
-            let button_div = document.createElement('div')
-            button_div.style.cssFloat = 'right'
-            a.appendChild(button_div)
-            let button = document.createElement('button')
-            button_div.appendChild(button)
-            button.appendChild(document.createTextNode('X'))
+            let remove_div = document.createElement('div')
+            remove_div.style.cssFloat = 'right'
+            a.appendChild(remove_div)
+            let img = document.createElement('img')
+            img.setAttribute("src", "../static/images/trashcan_icon.png")
+            img.setAttribute("alt", "remove")
+            img.setAttribute("width", "24px")
+            img.setAttribute("height", "24px")
             let remove_recipe_button_id = 'remove-recipe-' + recipe_id
-            button.setAttribute('id', remove_recipe_button_id)
+            img.setAttribute('id', remove_recipe_button_id)
+            remove_div.appendChild(img)
 
             initialise_remove_recipe_button(remove_recipe_button_id, recipe_id)
             
@@ -198,15 +201,20 @@ async function update_recipe_items(recipe_element_id){
         li.appendChild(document.createTextNode(items[i]['name']))
         recipe_items_div.appendChild(li)
         
-        let button_div = document.createElement('div')
-        button_div.style.cssFloat = 'right'
-        li.appendChild(button_div)
+        //delete button on right of list element
+        let remove_div = document.createElement('div')
+        remove_div.style.cssFloat = 'right'
+        li.appendChild(remove_div)
 
-        let button = document.createElement('button')
-        button_div.appendChild(button)
-        button.appendChild(document.createTextNode('X'))
+        let img = document.createElement('img')
+        img.setAttribute("src", "../static/images/trashcan_icon.png")
+        img.setAttribute("alt", "remove")
+        img.setAttribute("width", "22px")
+        img.setAttribute("height", "22px")
+        img.classList.add("remove-icon-items")
         let remove_item_button_id = 'remove-recipe-item-' + recipe_item_id
-        button.setAttribute('id', remove_item_button_id)
+        img.setAttribute('id', remove_item_button_id)
+        remove_div.appendChild(img)
 
         initialise_remove_item_button(remove_item_button_id, recipe_item_id, recipe_element_id)
     }
