@@ -74,4 +74,4 @@ def remove_item_from_recipe(recipe_id, item_id):
         db.session.delete(recipe_item)
         db.session.commit()
 
-    return jsonify(success=True), 200
+    return make_response(jsonify({}), 204)
