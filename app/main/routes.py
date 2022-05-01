@@ -21,17 +21,11 @@ def list():
 
 @bp.route('/recipes')
 def recipes():
-    #empty dictionary
-    recipes_array = []
     recipes = Recipe.query.all()
-
-    for recipe in recipes:
-        recipes_array.append({'id': recipe.id, 'name': recipe.name})
-
-    return render_template('recipes.html', recipes=recipes_array)
+    return render_template('recipes.html', recipes=recipes)
 
 
-@bp.route('/calendar', methods=['GET', 'POST'])
+@bp.route('/calendar')
 def calendar():
     return render_template('calendar.html')
 
@@ -71,20 +65,6 @@ def get_selected_dates():
         error = str(e.__dict__['orig'])
         res = make_response(jsonify({"error": error}), 500)
         return res
-
-@bp.route('/get_recipes', methods=['POST'])
-def get_recipes():
-
-    recipes = Recipe.query.all()
-    
-    recipes_data = []
-    if recipes:
-        for recipe in recipes:
-            recipes_data.append({'id': recipe.id, 'name': recipe.name})
-    else:
-        recipes_data = None
-
-    return jsonify({'data': recipes_data})
 
 
 @bp.route('/add_recipe', methods=['POST'])

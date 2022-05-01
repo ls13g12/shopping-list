@@ -132,8 +132,8 @@ async function update_recipe_list(){
 //returns an array of dicts with keys of recipe id and recipe name
 async function get_recipes(){
 
-    const res = await fetch('/get_recipes', {
-        method: 'POST',
+    const res = await fetch('/api/recipes', {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         }
@@ -152,7 +152,7 @@ async function get_recipes(){
 //returns an error if recipe already exists in db
 async function add_recipe(new_recipe){
     var data = {recipe: new_recipe}
-    const res = await fetch('/add_recipe', {
+    const res = await fetch('/api/recipes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

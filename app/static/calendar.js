@@ -226,8 +226,8 @@ async function addRecipeDropdownBox(dayTitleDiv, date_string){
 }
 
 async function addRecipeOptions(select){
-    const res = await fetch('/get_recipes', {
-        method: 'POST',
+    const res = await fetch('/api/recipes', {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         }
