@@ -24,33 +24,18 @@ function initialiseSubmitButton(){
 }
 
 async function getSelectedDates(){
-    const res = await fetch('/get_selected_dates', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-        })
-        .then(async res => {
-            if(res.status >= 200 && res.status < 300) return res.json()
-            else{
-                const data = await res.json()
-                console.log(data.error)
-            }
-        })
-        .then(data => {
-          if(data.dates){
-            startDate = new Date(data.dates.start_date)
-            endDate = new Date(data.dates.end_date)
-          }
-          else{
-            startDate = new Date()
-            endDate = new Date()
-          }
-          $('#start-date').val(startDate.toDateInputValue())
-          $('#end-date').val(endDate.toDateInputValue())
-        })
-        .catch((error) => {
-            console.error('Error:', error);
+    const res = await fetch('/api/selecteddates', {
+        method: 'GET'
+    })
+    .then(res => res.json())
+    .then(data => {
+        startDate = new Date(data.dates.start_date)
+        endDate = new Date(data.dates.end_date)
+        $('#start-date').val(startDate.toDateInputValue())
+        $('#end-date').val(endDate.toDateInputValue())
+    })
+    .catch((error) => {
+        console.error('Error:', error)
     })
 }
 
@@ -77,8 +62,8 @@ async function selectNewDates(startDate, endDate){
         start_date: startDate.toLocaleDateString(),
         end_date: endDate.toLocaleDateString() 
     }
-    const res = await fetch('/select_new_dates_items', {
-        method: 'POST',
+    const res = await fetch('/api/selecteddates', {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },

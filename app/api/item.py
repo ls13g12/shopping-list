@@ -14,10 +14,13 @@ def get_items(id):
         recipe_items = RecipeItem.query.filter_by(recipe_id=recipe.id).join(Item).all()
         items = []
         for recipe_item in recipe_items:
-            items.append({
-              "recipe_id": recipe_id,
-              "item_id": recipe_item.item.id, 
-              "name": recipe_item.item.name})
+            items.append(
+                {
+                    "recipe_id": recipe_id,
+                    "item_id": recipe_item.item.id,
+                    "name": recipe_item.item.name,
+                }
+            )
 
     else:
         items = Item.query.all()
@@ -27,6 +30,7 @@ def get_items(id):
             items.append({"id": item.id, "name": item.name})
 
     return jsonify({"data": items})
+
 
 @bp.route("/api/recipes/<int:id>/items", methods=["POST"])
 def add_item_to_recipe(id):
@@ -62,14 +66,16 @@ def add_item_to_recipe(id):
         error = str(e.__dict__["orig"])
         res = make_response(jsonify({"error": error}), 500)
         return res
-    
+
     return make_response(jsonify({}), 500)
 
 
 @bp.route("/api/recipes/<int:recipe_id>/items/<int:item_id>", methods=["DELETE"])
 def remove_item_from_recipe(recipe_id, item_id):
 
-    recipe_item = RecipeItem.query.filter_by(recipe_id=recipe_id, item_id=item_id).first()
+    recipe_item = RecipeItem.query.filter_by(
+        recipe_id=recipe_id, item_id=item_id
+    ).first()
     if recipe_item:
         db.session.delete(recipe_item)
         db.session.commit()

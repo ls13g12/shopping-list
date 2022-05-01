@@ -1,5 +1,5 @@
 from app.api import bp
-from app.models import Item, Recipe, RecipeDateLog, RecipeItem, SelectedDatesLog
+from app.models import Recipe, RecipeItem, SelectedDatesLog
 from flask import make_response, jsonify, request
 from app import db
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,17 +7,14 @@ from sqlalchemy.exc import SQLAlchemyError
 
 @bp.route("/api/recipes", methods=["GET"])
 def get_recipes():
-    if request.method == "GET":
-        recipes = Recipe.query.all()
+    recipes = Recipe.query.all()
 
-        recipes_data = []
-        if recipes:
-            for recipe in recipes:
-                recipes_data.append({"id": recipe.id, "name": recipe.name})
-        else:
-            recipes_data = None
-
-        return make_response(jsonify({"data": recipes_data}), 200)
+    return make_response(
+        jsonify(
+            {"data": [{"id": recipe.id, "name": recipe.name} for recipe in recipes]}
+        ),
+        200,
+    )
 
 
 @bp.route("/api/recipes", methods=["POST"])

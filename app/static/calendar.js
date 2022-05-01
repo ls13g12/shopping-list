@@ -17,28 +17,19 @@ function initialiseSubmitButton(){
 }
 
 async function getSelectedDates(){
-    const res = await fetch('/get_selected_dates', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-        })
-        .then(async res => {
-            if(res.status >= 200 && res.status < 300) return res.json()
-            else{
-                const data = await res.json()
-                console.log(data.error)
-            }
-        })
-        .then(data => {
-            startDate = new Date(data.dates.start_date)
-            endDate = new Date(data.dates.end_date)
-            $('#start-date').val(startDate.toDateInputValue())
-            $('#end-date').val(endDate.toDateInputValue())
-            loadCalendarView(startDate, endDate)
-        })
-        .catch((error) => {
-            console.error('Error:', error);
+    const res = await fetch('/api/selecteddates', {
+        method: 'GET'
+    })
+    .then(res => res.json())
+    .then(data => {
+        startDate = new Date(data.dates.start_date)
+        endDate = new Date(data.dates.end_date)
+        $('#start-date').val(startDate.toDateInputValue())
+        $('#end-date').val(endDate.toDateInputValue())
+        loadCalendarView(startDate, endDate)
+    })
+    .catch((error) => {
+        console.error('Error:', error)
     })
 }
 
@@ -65,19 +56,12 @@ async function selectNewDates(startDate, endDate){
         start_date: startDate.toLocaleDateString(),
         end_date: endDate.toLocaleDateString() 
     }
-    const res = await fetch('/select_new_dates', {
-        method: 'POST',
+    await fetch('/api/selecteddates', {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
-        })
-        .then(async res => {
-            if(res.status >= 200 && res.status < 300) return res.json()
-            else{
-                const data = await res.json()
-                console.log(data.error)
-            }
         })
         .then(function(){          
             loadCalendarView(startDate, endDate)
@@ -226,11 +210,8 @@ async function addRecipeDropdownBox(dayTitleDiv, date_string){
 }
 
 async function addRecipeOptions(select){
-    const res = await fetch('/api/recipes', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+    await fetch('/api/recipes', {
+        method: 'GET'
         })
         .then(res => res.json())
         .then(data => {
