@@ -33,8 +33,16 @@ function initialise_enter_keydown_items(recipe_element_id, add_item_to_recipe_in
     input_element.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
           let new_item = input_element.value
-          add_item_to_recipe(new_item, recipe_element_id)
+          if(new_item) add_item_to_recipe(new_item, recipe_element_id)
         }
+    });
+}
+
+function initialise_add_item_button(recipe_element_id, add_item_to_recipe_input_id, img){
+    var input_element = document.getElementById(add_item_to_recipe_input_id)
+    img.addEventListener('click', function (e) {
+        let new_item = input_element.value
+        if(new_item) add_item_to_recipe(new_item, recipe_element_id)
     });
 }
 
@@ -232,7 +240,23 @@ async function update_recipe_items(recipe_element_id){
     li.appendChild(input)
     recipe_items_div.appendChild(li)
 
+    //add button next to input element
+    let add_button_div = document.createElement('div')
+    add_button_div.style.cssFloat = 'right'
+    li.appendChild(add_button_div)
+
+    let img = document.createElement('img')
+    img.setAttribute("src", "../static/images/add_icon.png")
+    img.setAttribute("alt", "add")
+    img.setAttribute("width", "22px")
+    img.setAttribute("height", "22px")
+    img.classList.add("remove-icon-items")
+    add_button_div.appendChild(img)
+
+    initialise_add_item_button(recipe_element_id, add_item_to_recipe_input_id, img)
     initialise_enter_keydown_items(recipe_element_id, add_item_to_recipe_input_id)
+
+    input.focus()
 }
 
 //fetch items from database
