@@ -38,10 +38,16 @@ async function getSelectedDates(){
             }
         })
         .then(data => {
+          if(data.dates){
             startDate = new Date(data.dates.start_date)
             endDate = new Date(data.dates.end_date)
-            $('#start-date').val(startDate.toDateInputValue())
-            $('#end-date').val(endDate.toDateInputValue())
+          }
+          else{
+            startDate = new Date()
+            endDate = new Date()
+          }
+          $('#start-date').val(startDate.toDateInputValue())
+          $('#end-date').val(endDate.toDateInputValue())
         })
         .catch((error) => {
             console.error('Error:', error);

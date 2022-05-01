@@ -11,11 +11,12 @@ from datetime import datetime, timedelta
 @bp.route('/list')
 def list():
     dates = SelectedDatesLog.query.order_by(SelectedDatesLog.timestamp.desc()).first()
-
-    items = get_items_for_dates(dates)
-                
-    dates = {'start_date': dates.start_date.strftime("%m/%d/%Y"), 'end_date': dates.end_date.strftime("%m/%d/%Y")}
-        
+    items = []
+    dates = None
+    if dates:
+      items = get_items_for_dates(dates)
+      dates = {'start_date': dates.start_date.strftime("%m/%d/%Y"), 'end_date': dates.end_date.strftime("%m/%d/%Y")}
+     
     return render_template('list.html', items=items, dates=dates)
 
 @bp.route('/recipes')
@@ -62,9 +63,9 @@ def get_selected_dates():
         dates = SelectedDatesLog.query.order_by(SelectedDatesLog.timestamp.desc()).first()
         if dates:
             dates = {'start_date': dates.start_date.strftime("%m/%d/%Y"), 'end_date': dates.end_date.strftime("%m/%d/%Y")}
-            res = make_response(jsonify({'dates': dates}), 200)
-            print(res)
-            return res
+          
+        res = make_response(jsonify({'dates': dates}), 200)
+        return res
   
     except SQLAlchemyError as e:
         error = str(e.__dict__['orig'])
