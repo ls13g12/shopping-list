@@ -176,9 +176,8 @@ async function remove_recipe(recipe_id){
 		const res = await fetch(`/api/recipes/${recipe_id}`, {
 				method: 'DELETE'
 		})
-		.then(res => res.json())
-		.then(res => {
-				update_recipe_list()
+		.then(() => {
+			update_recipe_list()
 		})
 		.catch((error) => {
 				console.error('Error:', error);

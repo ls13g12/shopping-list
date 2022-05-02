@@ -114,16 +114,8 @@ function addDateRow(date){
 }
 
 async function loadRecipesFromDatabase(date_string){
-
-    var data = {
-        date_string: date_string
-    }
-    const res = await fetch('/get_recipes_for_date', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
+    const res = await fetch(`/api/recipes?date=${date_string}`, {
+        method: 'GET'
         })
         .then(async res => {
             if(res.status == 200) return res.json()
@@ -244,23 +236,12 @@ function initialiseAddRecipe(select, date_string){
 }
 
 async function addRecipe(recipe_id, date_string){
-    var recipe_data = {
-        recipe_id: recipe_id,
-        date_string: date_string
-    }
-    const res = await fetch('/add_recipe_date', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(recipe_data)
+
+    const res = await fetch(`/api/recipes/${recipe_id}?date=${date_string}`, {
+        method: 'POST'
         })
-        .then(async res => {
-            if(!res.ok){
-                const data = await res.json()
-                console.log(data.error)
-            }
-            if(res.ok) loadRecipesFromDatabase(date_string)
+        .then(() =>{
+            loadRecipesFromDatabase(date_string)
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -268,16 +249,8 @@ async function addRecipe(recipe_id, date_string){
 }
 
 async function removeRecipeFromDate(recipe_id, date_string){
-    var recipe_data = {
-        recipe_id: recipe_id,
-        date_string: date_string
-    }
-    const res = await fetch('/remove_recipe_date', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(recipe_data)
+    const res = await fetch(`/api/recipes/${recipe_id}?date=${date_string}`, {
+        method: 'DELETE'
         })
         .then(async res => {
             if(!res.ok){
