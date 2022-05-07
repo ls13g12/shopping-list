@@ -11,6 +11,7 @@ Recipes are stored and can be added to any date on the calendar. The list page d
     
 <img align="top" src="https://github.com/ls13g12/shopping-list/blob/main/screenshots/recipes_page.PNG" width=30% height=30%>
 </div>
+
 ### Quick Start
 
 1. Clone the repo
