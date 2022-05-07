@@ -4,13 +4,13 @@ A web application to help a household with meal planning and food shopping.
 Recipes are stored and can be added to any date on the calendar. The list page displays all recipe items for recipes within a selected date range.
 
 ### Screenshots
+<div>
+ <img align="top" src="https://github.com/ls13g12/shopping-list/blob/main/screenshots/list_page.PNG" width=30% height=30%>
 
-![Recipes Page](https://github.com/ls13g12/shopping-list/blob/main/screenshots/recipes_page.PNG)
-
-![Calendar_Page](https://github.com/ls13g12/shopping-list/blob/main/screenshots/calendar_page.PNG)
-
-![List_Page](https://github.com/ls13g12/shopping-list/blob/main/screenshots/list_page.PNG)
-
+<img align="top" src="https://github.com/ls13g12/shopping-list/blob/main/screenshots/calendar_page.PNG" width=30% height=30%>
+    
+<img align="top" src="https://github.com/ls13g12/shopping-list/blob/main/screenshots/recipes_page.PNG" width=30% height=30%>
+</div>
 ### Quick Start
 
 1. Clone the repo
